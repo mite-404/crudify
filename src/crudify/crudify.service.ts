@@ -1,0 +1,43 @@
+import { Model, FilterQuery, UpdateQuery } from "mongoose";
+import { QueryParser } from "../namespace/query-parser.namespace";
+
+export class CrudifyService<T> {
+  constructor(protected readonly model: Model<T>) {}
+
+  async create(createDto: Partial<T>): Promise<T | any> {
+    const entity = new this.model(createDto);
+    return entity.save();
+  }
+
+  async findAll(query: FilterQuery<T> = {}): Promise<any> {
+    const filters = QueryParser.parseFilters(query);
+    const sort = QueryParser.parseSort(query.sort);
+    const skip = parseInt(query.skip, 10) || 0;
+    const limit = parseInt(query.limit, 10) || 10;
+    const results = await this.model
+      .find(filters)
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
+      .exec();
+    const total = await this.model.countDocuments(filters).exec();
+
+    return { results, total, page: Math.ceil(skip / limit) };
+  }
+
+  async findOne(filter: FilterQuery<T>): Promise<T | null> {
+    return this.model.findOne(filter).exec();
+  }
+
+  async count(filter: Record<string, any>): Promise<number> {
+    return this.model.countDocuments(filter).exec();
+  }
+
+  async update(id: string, updateDto: UpdateQuery<T>): Promise<T | null> {
+    return this.model.findByIdAndUpdate(id, updateDto, { new: true }).exec();
+  }
+
+  async delete(id: string): Promise<T | null> {
+    return this.model.findByIdAndDelete(id).exec();
+  }
+}
