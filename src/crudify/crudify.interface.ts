@@ -1,4 +1,4 @@
-import { Type } from '@nestjs/common';
+import { Type } from "@nestjs/common";
 
 export interface ICrudify {
   model: {
@@ -6,5 +6,4 @@ export interface ICrudify {
     cdto?: Type;
     udto?: Type;
   };
-  service: any;
 }

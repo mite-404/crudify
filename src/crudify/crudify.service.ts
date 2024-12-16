@@ -1,6 +1,8 @@
 import { Model, FilterQuery, UpdateQuery } from "mongoose";
 import { QueryParser } from "../namespace/query-parser.namespace";
+import { Injectable } from "@nestjs/common";
 
+@Injectable()
 export class CrudifyService<T> {
   constructor(protected readonly model: Model<T>) {}
 
@@ -31,6 +33,12 @@ export class CrudifyService<T> {
 
   async count(filter: Record<string, any>): Promise<number> {
     return this.model.countDocuments(filter).exec();
+  }
+
+  async overwrite(id: string, updateDto: UpdateQuery<T>): Promise<T | null> {
+    return this.model
+      .findOneAndReplace({ _id: id }, updateDto, { new: true })
+      .exec();
   }
 
   async update(id: string, updateDto: UpdateQuery<T>): Promise<T | null> {
