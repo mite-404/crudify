@@ -1,5 +1,5 @@
 import { Model, FilterQuery, UpdateQuery } from "mongoose";
-import { QueryParser } from "../namespace/query-parser.namespace";
+import { QueryParser } from "./query-parser.namespace";
 import { Injectable } from "@nestjs/common";
 
 @Injectable()
