@@ -10,16 +10,19 @@
     "test": "jest"
   },
   "dependencies": {
-    "@nestjs/common": "^10.4.15"
+    "@nestjs/common": "^10.4.15",
+    "nest-winston": "^1.9.7",
+    "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0"
   },
   "peerDependencies": {
     "@nestjs/core": "^10.4.15"
   },
   "devDependencies": {
-    "@types/mongoose": "^5.11.96",
-    "@types/swagger-ui-express": "^4.1.7",
     "@nestjs/mongoose": "^10.1.0",
     "@nestjs/swagger": "^8.1.0",
+    "@types/mongoose": "^5.11.96",
+    "@types/swagger-ui-express": "^4.1.7",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "mongoose": "^8.8.4"
