@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { DynamicModule, Module } from "@nestjs/common";
 import "winston-daily-rotate-file";
 import { CrudifyLogger } from "./logger.service";
 import { APP_FILTER } from "@nestjs/core";
@@ -18,4 +18,21 @@ import { AllExceptionsFilter } from "./exception.filter";
   ],
   exports: [CrudifyLogger],
 })
-export class CrudifyLoggerModule {}
+export class CrudifyLoggerModule {
+  static forRoot(name: string): DynamicModule {
+    return {
+      module: CrudifyLoggerModule,
+      providers: [
+        {
+          provide: CrudifyLogger,
+          useValue: new CrudifyLogger(name),
+        },
+        {
+          provide: "LOGGER",
+          useClass: CrudifyLogger,
+        },
+      ],
+      exports: [CrudifyLogger, CrudifyLogger],
+    };
+  }
+}

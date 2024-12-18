@@ -5,10 +5,10 @@ export namespace LoggerConf {
     winston.format.timestamp({ format: "DD-MM-YYYY, HH:mm:ss" }),
     winston.format.errors({ stack: true }),
     winston.format.printf(
-      ({ timestamp, level, message, serviceName, context, trace }) => {
-        const appName = "Crudify";
+      ({ timestamp, level, message, name, context, trace }) => {
+        const appName = name || "Crudify";
         const processId = process.pid;
-        const service = serviceName || context || "UnknownService";
+        const service = context || "UnknownService";
         if (trace) {
           return `[${appName}] ${processId} - ${timestamp} ${level.toUpperCase()} [${service}] ${message} - ${trace}`;
         }
