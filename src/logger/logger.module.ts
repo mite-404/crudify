@@ -1,38 +1,33 @@
-import { DynamicModule, Module } from "@nestjs/common";
+import { DynamicModule, Module, OnModuleInit } from "@nestjs/common";
 import "winston-daily-rotate-file";
-import { CrudifyLogger } from "./logger.service";
-import { APP_FILTER } from "@nestjs/core";
-import { AllExceptionsFilter } from "./exception.filter";
+import * as errsole from "errsole";
+import ErrsoleMongoDB from "errsole-mongodb";
+import { ILoggerOptions } from "./logger.interface";
 
-@Module({
-  providers: [
-    CrudifyLogger,
-    {
-      provide: "LOGGER",
-      useClass: CrudifyLogger,
-    },
-    {
-      provide: APP_FILTER,
-      useClass: AllExceptionsFilter,
-    },
-  ],
-  exports: [CrudifyLogger],
-})
-export class CrudifyLoggerModule {
-  static forRoot(name: string): DynamicModule {
+@Module({})
+export class CrudifyLoggerModule implements OnModuleInit {
+  private static options: ILoggerOptions;
+  static forRoot(options: ILoggerOptions): DynamicModule {
+    this.options = {
+      uri: options.uri || "mongodb://localhost:27017",
+      dbName: options.dbName || "logs",
+    };
     return {
       module: CrudifyLoggerModule,
-      providers: [
-        {
-          provide: CrudifyLogger,
-          useValue: new CrudifyLogger(name),
-        },
-        {
-          provide: "LOGGER",
-          useClass: CrudifyLogger,
-        },
-      ],
-      exports: [CrudifyLogger, CrudifyLogger],
     };
+  }
+
+  onModuleInit() {
+    const mongoUri = CrudifyLoggerModule.options?.uri;
+    const dbName = CrudifyLoggerModule.options?.dbName;
+
+    if (!mongoUri) {
+      throw new Error("MongoDB URI not found");
+    }
+    errsole.initialize({
+      storage: new ErrsoleMongoDB(mongoUri, dbName!),
+      port: 3001,
+      enableConsoleOutput: false,
+    });
   }
 }
