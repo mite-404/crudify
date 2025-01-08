@@ -14,17 +14,35 @@ export namespace QueryParser {
     Object.keys(filters)
       .filter((key) => !["sort", "skip", "limit"].includes(key))
       .forEach((key) => {
-        const v = filters[key]?.split(":");
-        // const operator = v[0].replace('[', '').replace(']', '');
-        const operator = v[0].split("]")[0].replace("[", "");
-        const value = v[1];
-
-        query[key] = {
-          ...query[key],
-          ...QueryParser.getMongooseOperator(operator, value),
-        };
+        const vv = filters[key];
+        if (Array.isArray(vv)) {
+          vv.forEach((val: any) => {
+            QueryParser.addFilterToQuery({ query, key, val });
+          });
+        } else {
+          QueryParser.addFilterToQuery({ query, key, val: vv });
+        }
       });
     return query;
+  }
+
+  export function addFilterToQuery({
+    query,
+    key,
+    val,
+  }: {
+    query: any;
+    key: string;
+    val: any;
+  }) {
+    const v = val?.split(":");
+    const operator = v[0].split("]")[0].replace("[", "");
+    const value = v[1];
+
+    query[key] = {
+      ...query[key],
+      ...QueryParser.getMongooseOperator(operator, value),
+    };
   }
 
   export function parseSort(sort: string): Record<string, number> | any {
