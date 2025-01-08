@@ -281,4 +281,4 @@ Thank you so much ❤️.
 
 ## License
 
-Crudify is open-source and licensed under the MIT License. See the LICENSE file for more details.
+See the LICENSE file for more details.
