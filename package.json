@@ -1,6 +1,6 @@
 {
   "name": "@mitinoh/nest-crudify",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Configurable CRUD module for NestJS and Mongoose.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
