@@ -272,6 +272,13 @@ field=[$operator]:value
 
 We love contributions! Whether you’ve spotted a bug or have an awesome idea, feel free to open an issue or submit a PR.
 
+## Support
+ If you like my work and want to support give a ⭐ to the repo.
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/yellow_img.png)](https://www.buymeacoffee.com/mitinoh) 
+
+Thank you so much ❤️.
+
 ## License
 
 Crudify is open-source and licensed under the MIT License. See the LICENSE file for more details.
