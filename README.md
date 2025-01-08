@@ -16,7 +16,7 @@ Let Crudify do the heavy lifting for you! With this simple yet powerful NestJS l
 Ready to get started? Just install **Crudify** and let it work its magic:
 
 ```bash
-npm install crudify
+npm install ncrudify
 ```
 
 ## 🙌 Features
@@ -72,13 +72,13 @@ export class AppModule {}
 `Crudify` makes it easy to generate Swagger documentation automatically for your API. Just a few steps and you're good to go!
 
 - **Import CrudifySwaggerModule in your AppModule:**
-  In your `app.module.ts`, import `CrudifySwaggerModule` from `@mitinoh/nest-crudify`:
+  In your `app.module.ts`, import `CrudifySwaggerModule` from `ncrudify`:
 
 ```javascript
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { UserModule } from "./user/user.module";
-import { CrudifySwaggerModule } from "@mitinoh/nest-crudify";
+import { CrudifySwaggerModule } from "ncrudify";
 
 @Module({
   imports: [
@@ -96,7 +96,7 @@ export class AppModule {}
 ```javascript
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
-import { CrudifySwaggerModule } from "@mitinoh/nest-crudify";
+import { CrudifySwaggerModule } from "ncrudify";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -119,7 +119,7 @@ First, you need to import `CrudifyLoggerModule` in your `app.module.ts` to enabl
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { UserModule } from "./user/user.module";
-import { CrudifySwaggerModule } from "@mitinoh/nest-crudify";
+import { CrudifySwaggerModule } from "ncrudify";
 
 @Module({
   imports: [
@@ -177,7 +177,7 @@ import { Injectable } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { FilterQuery, Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { CrudifyService } from '@mitinoh/nest-crudify';
+import { CrudifyService } from 'ncrudify';
 
 @Injectable()
 export class UserService extends CrudifyService<User> {
@@ -200,7 +200,7 @@ export class UserService extends CrudifyService<User> {
 import { Controller, Get } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
-import { Crudify, CrudifyController } from '@mitinoh/nest-crudify';
+import { Crudify, CrudifyController } from 'ncrudify';
 
 @Crudify({
   model: {
