@@ -1,11 +1,17 @@
 {
-  "name": "@beyonx/nest-crudify",
+  "name": "@mitinoh/nest-crudify",
   "version": "1.0.0",
   "description": "Configurable CRUD module for NestJS and Mongoose.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mitinoh/nest-crudify.git"
+  },
+  "author": "Mite",
+  "license": "MIT",
   "publishConfig": {
-    "@mitinoh:registry": "https://npm.pkg.github.com"
+    "registry": "https://npm.pkg.github.com"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
