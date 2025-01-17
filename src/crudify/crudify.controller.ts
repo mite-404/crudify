@@ -10,7 +10,6 @@ import {
   Query,
 } from "@nestjs/common";
 import { CrudifyService } from "./crudify.service";
-
 @Controller(":entity")
 export class CrudifyController<T> {
   constructor(private readonly crudService: CrudifyService<T>) {}
@@ -22,7 +21,7 @@ export class CrudifyController<T> {
 
   @Post("/bulk")
   createBulk(@Body() data: T[]) {
-    return this.crudService.createMany(data);
+    return this.crudService.createBulk(data);
   }
 
   @Get()
@@ -41,9 +40,9 @@ export class CrudifyController<T> {
   }
 
   @Patch("/bulk")
-  async updateMany(@Body() body: { filter: any; updateDto: any }) {
+  async updateBulk(@Body() body: { filter: any; updateDto: any }) {
     const { filter, updateDto } = body;
-    return this.crudService.updateMany(filter, updateDto);
+    return this.crudService.updateBulk(filter, updateDto);
   }
 
   @Patch(":id")
@@ -52,8 +51,8 @@ export class CrudifyController<T> {
   }
 
   @Delete("bulk")
-  async deleteMany(@Body() ids: string[]) {
-    return this.crudService.deleteMany(ids);
+  async deleteBulk(@Body() ids: string[]) {
+    return this.crudService.deleteBulk(ids);
   }
 
   @Delete(":id")

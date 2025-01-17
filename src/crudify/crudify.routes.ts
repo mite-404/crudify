@@ -1,5 +1,4 @@
 import {
-  applyDecorators,
   Body,
   Delete,
   Get,
@@ -9,19 +8,8 @@ import {
   Put,
   Query,
 } from "@nestjs/common";
-import {
-  ApiOperation,
-  ApiCreatedResponse,
-  ApiOkResponse,
-  ApiNotFoundResponse,
-  ApiBadRequestResponse,
-  ApiConflictResponse,
-  ApiParam,
-  ApiBody,
-  ApiQuery,
-  ApiResponse,
-} from "@nestjs/swagger";
 import { ICrudify } from "./crudify.interface";
+import { CrudifyRoutesDecorator } from "./crudify.routesdecorator";
 export namespace CrudifyRoutes {
   export function routes(options: ICrudify) {
     return [
@@ -38,44 +26,12 @@ export namespace CrudifyRoutes {
   }
 
   function RouteFindAll(options: ICrudify) {
-    const name: string = options.model.type.name.toLowerCase();
     return {
       methodName: "findAll",
       httpMethod: Get,
       path: "/",
       parameters: [{ index: 0, decorator: Query(), type: Object }],
-      decorators: [
-        ApiOperation({ summary: `Retrieve all ${name} resources` }),
-        ApiOkResponse({
-          description: `List of ${name} resources`,
-          type: [options.model.type],
-        }),
-        ApiNotFoundResponse({ description: "Resources not found" }),
-        ApiQuery({
-          name: "filter",
-          required: false,
-          type: String,
-          description: "Filters to apply",
-        }),
-        ApiQuery({
-          name: "limit",
-          required: false,
-          type: Number,
-          description: "Number of records to return",
-        }),
-        ApiQuery({
-          name: "skip",
-          required: false,
-          type: Number,
-          description: "Number of records to skip",
-        }),
-        ApiQuery({
-          name: "sort",
-          required: false,
-          type: String,
-          description: "Sorting fields",
-        }),
-      ],
+      decorators: CrudifyRoutesDecorator.findAllDecorators(options),
     };
   }
 
@@ -93,19 +49,7 @@ export namespace CrudifyRoutes {
           description: `ID of the ${name} resource`,
         },
       ],
-      decorators: [
-        ApiOperation({ summary: `Retrive a ${name} resource by ID` }),
-        ApiOkResponse({
-          description: `Resource ${name} found`,
-          type: options.model.type,
-        }),
-        ApiNotFoundResponse({ description: "Resource not found" }),
-        ApiParam({
-          name: "id",
-          description: "ID of the resource",
-          type: String,
-        }),
-      ],
+      decorators: CrudifyRoutesDecorator.findOneDecorators(options),
     };
   }
 
@@ -116,21 +60,7 @@ export namespace CrudifyRoutes {
       httpMethod: Post,
       path: "/",
       parameters: [{ index: 0, decorator: Body(), type: options.model.cdto }],
-      decorators: [
-        ApiOperation({ summary: `Create a ${name} resource` }),
-        ApiCreatedResponse({
-          description: `The resource  ${name} has been successfully created`,
-          type: options.model.type,
-        }),
-        ApiBadRequestResponse({ description: "Invalid input data" }),
-        ApiConflictResponse({
-          description: "Conflict in creating the resource",
-        }),
-        ApiBody({
-          description: "Data of the new resource",
-          type: options.model.type,
-        }),
-      ],
+      decorators: CrudifyRoutesDecorator.createDecorators(options),
     };
   }
 
@@ -148,21 +78,7 @@ export namespace CrudifyRoutes {
           description: `Array of ${name} resources to create`,
         },
       ],
-      decorators: [
-        ApiOperation({ summary: `Create multiple ${name} resources` }),
-        ApiCreatedResponse({
-          description: "The resources have been created",
-          type: [options.model.type],
-        }),
-        ApiBadRequestResponse({ description: "Invalid input data" }),
-        ApiConflictResponse({
-          description: "Conflict in creating the resources",
-        }),
-        ApiBody({
-          description: "Data of the new resources",
-          type: [options.model.type],
-        }),
-      ],
+      decorators: CrudifyRoutesDecorator.createBulkDecorators(options),
     };
   }
 
@@ -181,30 +97,14 @@ export namespace CrudifyRoutes {
         },
         { index: 1, decorator: Body(), type: options.model.cdto },
       ],
-      decorators: [
-        ApiOperation({ summary: `Update a ${name} resource` }),
-        ApiOkResponse({
-          description: `The resource ${name} has been updated`,
-          type: options.model.udto,
-        }),
-        ApiBadRequestResponse({ description: "Invalid data" }),
-        ApiParam({
-          name: "id",
-          description: `ID of the ${name} resource`,
-          type: String,
-        }),
-        ApiBody({
-          description: "Updated data of the resource",
-          type: options.model.type,
-        }),
-      ],
+      decorators: CrudifyRoutesDecorator.updateDecorators(options),
     };
   }
 
   function RoutePatchBulk(options: ICrudify) {
     const name: string = options.model.type.name.toLowerCase();
     return {
-      methodName: "updateMany",
+      methodName: "updateBulk",
       httpMethod: Patch,
       path: "/bulk",
       parameters: [
@@ -215,30 +115,7 @@ export namespace CrudifyRoutes {
           description: `Object containing filter and data to update multiple ${name} resources`,
         },
       ],
-      decorators: [
-        ApiOperation({ summary: `Update multiple ${name} resources` }),
-        ApiOkResponse({
-          description: `The resources have been updated`,
-          type: options.model.type,
-        }),
-        ApiBadRequestResponse({ description: "Invalid data" }),
-        ApiBody({
-          description: `Object containing filter and updated data`,
-          schema: {
-            type: "object",
-            properties: {
-              filter: {
-                type: "object",
-                description: "Filter to select the resources to update",
-              },
-              data: {
-                type: "object",
-                description: "Data to apply to the selected resources",
-              },
-            },
-          },
-        }),
-      ],
+      decorators: CrudifyRoutesDecorator.updateBulkDecorators(options),
     };
   }
 
@@ -257,23 +134,7 @@ export namespace CrudifyRoutes {
         },
         { index: 1, decorator: Body(), type: options.model.cdto },
       ],
-      decorators: [
-        ApiOperation({ summary: `Overwrite a ${name} resource` }),
-        ApiOkResponse({
-          description: "The resource has been overwrited",
-          type: options.model.udto,
-        }),
-        ApiBadRequestResponse({ description: "Invalid data" }),
-        ApiParam({
-          name: "id",
-          description: `ID of the ${name} resource`,
-          type: String,
-        }),
-        ApiBody({
-          description: "Overwrited data of the resource",
-          type: options.model.type,
-        }),
-      ],
+      decorators: CrudifyRoutesDecorator.overwriteDecorators(options),
     };
   }
 
@@ -291,23 +152,14 @@ export namespace CrudifyRoutes {
           description: `ID of the ${name} resource`,
         },
       ],
-      decorators: [
-        ApiOperation({ summary: `Delete a ${name} resource` }),
-        ApiOkResponse({ description: "The resource has been deleted" }),
-        ApiNotFoundResponse({ description: "Resource not found" }),
-        ApiParam({
-          name: "id",
-          description: "ID of the resource",
-          type: String,
-        }),
-      ],
+      decorators: CrudifyRoutesDecorator.deleteDecorators(options),
     };
   }
 
   function RouteDeleteBulk(options: ICrudify) {
     const name: string = options.model.type.name.toLowerCase();
     return {
-      methodName: "deleteMany",
+      methodName: "deleteBulk",
       httpMethod: Delete,
       path: "/bulk",
       parameters: [
@@ -318,14 +170,7 @@ export namespace CrudifyRoutes {
           description: `Array of IDs of the ${name} resources to be deletedss`,
         },
       ],
-      decorators: [
-        ApiOperation({ summary: `Delete multiple ${name} resources` }),
-        ApiOkResponse({ description: "The resources have been deleted" }),
-        ApiNotFoundResponse({ description: "Some resources not found" }),
-        ApiBadRequestResponse({
-          description: "Invalid input, expected an array of IDs",
-        }),
-      ],
+      decorators: CrudifyRoutesDecorator.deleteBulkDecorators(options),
     };
   }
 }
