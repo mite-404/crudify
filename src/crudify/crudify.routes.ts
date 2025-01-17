@@ -28,8 +28,11 @@ export namespace CrudifyRoutes {
       RouteFindAll(options),
       RouteFindOne(options),
       RouteCreate(options),
+      RouteCreateBulk(options),
+      RoutePatchBulk(options),
       RoutePatch(options),
       RoutePut(options),
+      RouteDeleteBulk(options),
       RouteDelete(options),
     ];
   }
@@ -131,6 +134,38 @@ export namespace CrudifyRoutes {
     };
   }
 
+  function RouteCreateBulk(options: ICrudify) {
+    const name: string = options.model.type.name.toLowerCase();
+    return {
+      methodName: "createBulk",
+      httpMethod: Post,
+      path: "/bulk",
+      parameters: [
+        {
+          index: 0,
+          decorator: Body(),
+          type: [options.model.cdto],
+          description: `Array of ${name} resources to create`,
+        },
+      ],
+      decorators: [
+        ApiOperation({ summary: `Create multiple ${name} resources` }),
+        ApiCreatedResponse({
+          description: "The resources have been created",
+          type: [options.model.type],
+        }),
+        ApiBadRequestResponse({ description: "Invalid input data" }),
+        ApiConflictResponse({
+          description: "Conflict in creating the resources",
+        }),
+        ApiBody({
+          description: "Data of the new resources",
+          type: [options.model.type],
+        }),
+      ],
+    };
+  }
+
   function RoutePatch(options: ICrudify) {
     const name: string = options.model.type.name.toLowerCase();
     return {
@@ -161,6 +196,47 @@ export namespace CrudifyRoutes {
         ApiBody({
           description: "Updated data of the resource",
           type: options.model.type,
+        }),
+      ],
+    };
+  }
+
+  function RoutePatchBulk(options: ICrudify) {
+    const name: string = options.model.type.name.toLowerCase();
+    return {
+      methodName: "updateMany",
+      httpMethod: Patch,
+      path: "/bulk",
+      parameters: [
+        {
+          index: 0,
+          decorator: Body(),
+          type: Object,
+          description: `Object containing filter and data to update multiple ${name} resources`,
+        },
+      ],
+      decorators: [
+        ApiOperation({ summary: `Update multiple ${name} resources` }),
+        ApiOkResponse({
+          description: `The resources have been updated`,
+          type: options.model.type,
+        }),
+        ApiBadRequestResponse({ description: "Invalid data" }),
+        ApiBody({
+          description: `Object containing filter and updated data`,
+          schema: {
+            type: "object",
+            properties: {
+              filter: {
+                type: "object",
+                description: "Filter to select the resources to update",
+              },
+              data: {
+                type: "object",
+                description: "Data to apply to the selected resources",
+              },
+            },
+          },
         }),
       ],
     };
@@ -223,6 +299,31 @@ export namespace CrudifyRoutes {
           name: "id",
           description: "ID of the resource",
           type: String,
+        }),
+      ],
+    };
+  }
+
+  function RouteDeleteBulk(options: ICrudify) {
+    const name: string = options.model.type.name.toLowerCase();
+    return {
+      methodName: "deleteMany",
+      httpMethod: Delete,
+      path: "/bulk",
+      parameters: [
+        {
+          index: 0,
+          decorator: Body(),
+          type: Array,
+          description: `Array of IDs of the ${name} resources to be deletedss`,
+        },
+      ],
+      decorators: [
+        ApiOperation({ summary: `Delete multiple ${name} resources` }),
+        ApiOkResponse({ description: "The resources have been deleted" }),
+        ApiNotFoundResponse({ description: "Some resources not found" }),
+        ApiBadRequestResponse({
+          description: "Invalid input, expected an array of IDs",
         }),
       ],
     };

@@ -1,5 +1,4 @@
 import { DynamicModule, Module, OnModuleInit } from "@nestjs/common";
-import "winston-daily-rotate-file";
 import * as errsole from "errsole";
 import ErrsoleMongoDB from "errsole-mongodb";
 import { ILoggerOptions } from "./logger.interface";

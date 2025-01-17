@@ -11,6 +11,10 @@ export class CrudifyService<T> {
     return entity.save();
   }
 
+  async createMany(data: T[]): Promise<T[] | any> {
+    return this.model.insertMany(data);
+  }
+
   async findAll(query: FilterQuery<T> = {}): Promise<any> {
     const filters = QueryParser.parseFilters(query);
     const sort = QueryParser.parseSort(query.sort);
@@ -45,7 +49,15 @@ export class CrudifyService<T> {
     return this.model.findByIdAndUpdate(id, updateDto, { new: true }).exec();
   }
 
+  async updateMany(filter: any, updateDto: UpdateQuery<T>): Promise<any> {
+    return this.model.updateMany(filter, { $set: updateDto }).exec();
+  }
+
   async delete(id: string): Promise<T | null> {
     return this.model.findByIdAndDelete(id).exec();
+  }
+
+  async deleteMany(ids: string[]): Promise<any> {
+    return this.model.deleteMany({ _id: { $in: ids } }).exec();
   }
 }
