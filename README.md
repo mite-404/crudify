@@ -32,11 +32,14 @@ npm install ncrudify
 Once you set it up, Crudify will handle these endpoints for you:
 
 - `POST /your-model:` Create a new record
+- `POST /your-model/bulk:` Create multiple new records
 - `GET /your-model:` Retrieve all records
 - `GET /your-model/:id:` Retrieve a specific record by ID
 - `PATCH /your-model/:id:` Update a record by ID
+- `PATCH /your-model/bulk` Update multiple records with filter in body
 - `PUT /your-model/:id:` Replace a record by ID
 - `DELETE /your-model/:id:` Delete a record by ID
+- `DELETE /your-model/bulk` Delete multiple records
 
 ## 💥 Get Started Now
 
@@ -206,6 +209,9 @@ import { Crudify, CrudifyController } from 'ncrudify';
   model: {
     type: User,
   },
+  routes: {
+    exclued: ['updateBulk'] // this route will not be generated
+  }
 })
 @Controller('users')
 export class UserController extends CrudifyController<User> {
