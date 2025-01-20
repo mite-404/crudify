@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.1] - 2025-01-20
+## Bug
+- **MongoDB URI Configuration**: Resolved an issue where the MongoDB URI was not being recognized properly when configuring the `CrudifyLoggerModule`. The default URI `mongodb://localhost:27017` with `logs` as the database is now used correctly.
+  - You can now configure the module using `CrudifyLoggerModule.forRoot()` with a custom URI and database name:
+    ```typescript
+    CrudifyLoggerModule.forRoot({
+      uri: 'mongodb://xxx.xxx.xxx.xxx:yyyyy/',
+      dbName: 'mydblogger',
+    });
+    ```
+---
+
 ## [1.1.0] - 2025-01-17
 ### Added
 - **Route Exclusion:** Added the ability to exclude specific routes from CRUD generation via the `routes.exclude` option in the `@Crudify` decorator.
