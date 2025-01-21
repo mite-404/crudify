@@ -18,7 +18,10 @@ import { IRouteConfig } from "./interface/routeconfig.interface";
 
 export namespace CrudifyRoutesDecorator {
   export function getDecorators(options: ICrudify, route: ControllerMethods) {
-    if (options.routes?.exclude?.includes(route))
+    const routeconfig: IRouteConfig | undefined =
+      options.routes?.config?.[route];
+
+    if (options.routes?.exclude?.includes(route) || routeconfig?.disabled)
       return [ApiExcludeEndpoint(), UseGuards(DisableRouteGuard)];
 
     let routeDecorators: MethodDecorator[] = [];
@@ -45,8 +48,6 @@ export namespace CrudifyRoutesDecorator {
         routeDecorators = [];
     }
 
-    const routeconfig: IRouteConfig | undefined =
-      options.routes?.config?.[route];
     const userRouteDecorators: MethodDecorator[] =
       routeconfig?.decorators || [];
 
