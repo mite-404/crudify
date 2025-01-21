@@ -129,11 +129,15 @@ import { CrudifySwaggerModule } from "ncrudify";
     MongooseModule.forRoot(process.env.MONGODB_URI),
     UserModule,
     CrudifySwaggerModule, 
-    CrudifyLoggerModule // Import this module
+    CrudifyLoggerModule.forRoot({
+      uri: process.env.MONGODB_URI,
+      dbName: process.env.MONGODB_LOGDB,
+    }), // Import this module
   ],
 })
 export class AppModule {}
 ```
+
 This will set up the Crudify Logger to listen on port 3001 by default. The logger will catch any uncaught errors in your application and log them in a clear and organized way for you to review.
 
 You can also adjust the logger’s configuration, such as the log level, to suit your project’s needs.
@@ -244,7 +248,112 @@ import { UserSchema } from "./entities/user.entity";
 })
 export class UserModule {}
 ```
+# Custom Decorators
 
+In Crudify, you can add custom decorators to individual routes or apply a decorator to all routes in your controller.
+
+### Adding Custom Decorators
+To add custom decorators to specific routes, you can define them in the config object for each route. 
+ - You can also apply decorators globally to all routes at once, rather than specifying them for each individual route. This is useful when you want to apply the same logic (like guards or documentation) across multiple endpoints in your controller.
+Here's an example:
+```javascript 
+@Crudify({
+  model: {
+    type: User, // Define your model
+  },
+  routes: {
+    config: {
+      // Custom decorators for the 'findAll' route
+      findAll: {
+        decorators: [
+          ApiOperation({
+            summary: 'Retrieve all users',
+            description: 'This endpoint fetches all users from the database.',
+          }), 
+        ],
+        disabled: false, // Optional: Specify whether this route is enabled or disabled
+      },
+      // Custom decorators for the 'create' route
+      create: {
+        decorators: [
+          ApiOperation({
+            summary: 'Create a new user',
+            description: 'Use this endpoint to create a new user.',
+          }), 
+        ],
+      },
+    },
+    decorators: [
+      UseGuards(LoggingGuard), // Apply a guard to all routes
+      ApiOperation({
+        summary: 'Global Operation Summary',
+        description: 'This is a global description that will apply to all routes.',
+      }), // Global Swagger documentation
+    ],
+  },
+})
+class UserController {
+  // Your controller methods
+}
+```
+
+### Explanation
+- **Global Decorators:** The decorators array inside the routes object will apply to all routes in the controller. For example, in the above example, UseGuards(LoggingGuard) and the global ApiOperation decorator are applied to every route in the controller.
+
+- **Route-Specific Decorators:** You can still apply specific decorators to individual routes via the config object. These will be combined with the global decorators.
+---
+# Authorization
+For managing route access control, you can use authorization decorators such as `UseGuards` or create your own custom decorators. These decorators help ensure that only authorized users can access specific routes.
+
+## Using `UseGuards` for Authorization
+`UseGuards` is a built-in NestJS decorator that allows you to specify guards that control access to your routes. Guards implement the `CanActivate` interface and determine if a request is authorized.
+
+You can use `UseGuards` in combination with Crudify to protect your routes with custom authorization logic.
+
+```javascript
+@Crudify({
+  model: {
+    type: User, 
+  },
+  routes: {
+    config: {
+      create: {
+        decorators: [
+          UseGuards(AuthGuard), // Protect 'create' route with an authorization guard
+        ],
+      },
+    },
+  },
+})
+class UserController {
+  // Your controller methods
+}
+```
+
+## Explanation
+- **Using `UseGuards`**: In the example above, `UseGuards(DisableRouteGuard)` is used to protect the `findAll` route. You can replace `DisableRouteGuard` with any custom guard that contains your authorization logic.
+- **Custom Authorization Guards:** Guards can be custom-built to implement complex authorization rules (e.g., checking user roles or permissions).
+
+### Creating a Custom Authorization Guard
+```javascript 
+import { Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext } from '@nestjs/common';
+import { Observable } from 'rxjs';
+
+@Injectable()
+export class AuthGuard implements CanActivate {
+  canActivate(
+    context: ExecutionContext,
+  ): boolean | Promise<boolean> | Observable<boolean> {
+    const request = context.switchToHttp().getRequest();
+    // Authorization logic: check if user has 'admin' role
+    return request.user && request.user.role === 'admin';
+  }
+}
+
+```
+
+--- 
 ## Filter Format
 Filters should be specified in the following format:
 ```
