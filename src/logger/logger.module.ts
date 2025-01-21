@@ -26,7 +26,7 @@ export class CrudifyLoggerModule implements OnModuleInit {
     errsole.initialize({
       storage: new ErrsoleMongoDB(mongoUri, dbName!),
       port: 3001,
-      enableConsoleOutput: false,
+      enableConsoleOutput: true,
     });
   }
 }

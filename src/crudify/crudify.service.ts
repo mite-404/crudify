@@ -16,16 +16,15 @@ export class CrudifyService<T> {
   }
 
   async findAll(query: FilterQuery<T> = {}): Promise<any> {
-    const filters = QueryParser.parseFilters(query);
-    const sort = QueryParser.parseSort(query.sort);
-    const skip = parseInt(query.skip, 10) || 0;
-    const limit = parseInt(query.limit, 10) || 10;
+    const { filters, populate, sort, skip, limit } = QueryParser.parse(query);
     const results = await this.model
       .find(filters)
+      .populate(populate)
       .sort(sort)
       .skip(skip)
       .limit(limit)
       .exec();
+
     const total = await this.model.countDocuments(filters).exec();
 
     return { results, total, page: Math.ceil(skip / limit) };
