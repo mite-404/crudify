@@ -38,7 +38,7 @@ export namespace CrudifyRoutes {
   }
 
   function RouteFindOne(options: ICrudify) {
-    const methodName: ControllerMethods = "findAll";
+    const methodName: ControllerMethods = "findOne";
     const name: string = options.model.type.name.toLowerCase();
     return {
       methodName,
@@ -57,7 +57,7 @@ export namespace CrudifyRoutes {
   }
 
   function RouteCreate(options: ICrudify) {
-    const methodName: ControllerMethods = "findAll";
+    const methodName: ControllerMethods = "create";
     const name: string = options.model.type.name.toLowerCase();
     return {
       methodName,
@@ -69,7 +69,7 @@ export namespace CrudifyRoutes {
   }
 
   function RouteCreateBulk(options: ICrudify) {
-    const methodName: ControllerMethods = "findAll";
+    const methodName: ControllerMethods = "createBulk";
     const name: string = options.model.type.name.toLowerCase();
     return {
       methodName,
@@ -88,7 +88,7 @@ export namespace CrudifyRoutes {
   }
 
   function RoutePatch(options: ICrudify) {
-    const methodName: ControllerMethods = "findAll";
+    const methodName: ControllerMethods = "update";
     const name: string = options.model.type.name.toLowerCase();
     return {
       methodName,
@@ -108,7 +108,7 @@ export namespace CrudifyRoutes {
   }
 
   function RoutePatchBulk(options: ICrudify) {
-    const methodName: ControllerMethods = "findAll";
+    const methodName: ControllerMethods = "updateBulk";
     const name: string = options.model.type.name.toLowerCase();
     return {
       methodName,
@@ -127,7 +127,7 @@ export namespace CrudifyRoutes {
   }
 
   function RoutePut(options: ICrudify) {
-    const methodName: ControllerMethods = "findAll";
+    const methodName: ControllerMethods = "put";
     const name: string = options.model.type.name.toLowerCase();
     return {
       methodName,
@@ -147,7 +147,7 @@ export namespace CrudifyRoutes {
   }
 
   function RouteDelete(options: ICrudify) {
-    const methodName: ControllerMethods = "findAll";
+    const methodName: ControllerMethods = "delete";
     const name: string = options.model.type.name.toLowerCase();
     return {
       methodName,
@@ -166,7 +166,7 @@ export namespace CrudifyRoutes {
   }
 
   function RouteDeleteBulk(options: ICrudify) {
-    const methodName: ControllerMethods = "findAll";
+    const methodName: ControllerMethods = "deleteBulk";
     const name: string = options.model.type.name.toLowerCase();
     return {
       methodName,
