@@ -1,4 +1,4 @@
-import { ControllerMethods, ICrudify } from "./crudify.interface";
+import { ICrudify } from "./interface/crudify.interface";
 import { UseGuards } from "@nestjs/common";
 import { DisableRouteGuard } from "./disable.guard";
 import {
@@ -13,36 +13,47 @@ import {
   ApiQuery,
   ApiExcludeEndpoint,
 } from "@nestjs/swagger";
+import { ControllerMethods } from "./interface/controllermethods.type";
+import { IRouteConfig } from "./interface/routeconfig.interface";
 
 export namespace CrudifyRoutesDecorator {
   export function getDecorators(options: ICrudify, route: ControllerMethods) {
     if (options.routes?.exclude?.includes(route))
       return [ApiExcludeEndpoint(), UseGuards(DisableRouteGuard)];
+
+    let routeDecorators: MethodDecorator[] = [];
     switch (route) {
       case "create":
-        return createDecorators(options);
+        routeDecorators = createDecorators(options);
       case "createBulk":
-        return createBulkDecorators(options);
+        routeDecorators = createBulkDecorators(options);
       case "findAll":
-        return findAllDecorators(options);
+        routeDecorators = findAllDecorators(options);
       case "findOne":
-        return findOneDecorators(options);
+        routeDecorators = findOneDecorators(options);
       case "put":
-        return overwriteDecorators(options);
+        routeDecorators = overwriteDecorators(options);
       case "update":
-        return updateDecorators(options);
+        routeDecorators = updateDecorators(options);
       case "updateBulk":
-        return updateBulkDecorators(options);
+        routeDecorators = updateBulkDecorators(options);
       case "delete":
-        return deleteDecorators(options);
+        routeDecorators = deleteDecorators(options);
       case "deleteBulk":
-        return deleteBulkDecorators(options);
+        routeDecorators = deleteBulkDecorators(options);
       default:
-        return [];
+        routeDecorators = [];
     }
+
+    const routeconfig: IRouteConfig | undefined =
+      options.routes?.config?.[route];
+    const userRouteDecorators: MethodDecorator[] =
+      routeconfig?.decorators || [];
+
+    return [...userRouteDecorators, ...routeDecorators];
   }
 
-  export function createDecorators(options: ICrudify): any[] {
+  function createDecorators(options: ICrudify): MethodDecorator[] {
     const name: string = options.model.type.name.toLowerCase();
     return [
       ApiOperation({ summary: `Create a ${name} resource` }),
@@ -61,7 +72,7 @@ export namespace CrudifyRoutesDecorator {
     ];
   }
 
-  export function createBulkDecorators(options: ICrudify): any[] {
+  function createBulkDecorators(options: ICrudify): MethodDecorator[] {
     const name: string = options.model.type.name.toLowerCase();
     return [
       ApiOperation({ summary: `Create multiple ${name} resources` }),
@@ -80,7 +91,7 @@ export namespace CrudifyRoutesDecorator {
     ];
   }
 
-  export function findAllDecorators(options: ICrudify): any[] {
+  function findAllDecorators(options: ICrudify): MethodDecorator[] {
     const name: string = options.model.type.name.toLowerCase();
     return [
       ApiOperation({ summary: `Retrieve all ${name} resources` }),
@@ -116,7 +127,7 @@ export namespace CrudifyRoutesDecorator {
     ];
   }
 
-  export function findOneDecorators(options: ICrudify): any[] {
+  function findOneDecorators(options: ICrudify): MethodDecorator[] {
     const name: string = options.model.type.name.toLowerCase();
     return [
       ApiOperation({ summary: `Retrive a ${name} resource by ID` }),
@@ -133,7 +144,7 @@ export namespace CrudifyRoutesDecorator {
     ];
   }
 
-  export function overwriteDecorators(options: ICrudify): any[] {
+  function overwriteDecorators(options: ICrudify): MethodDecorator[] {
     const name: string = options.model.type.name.toLowerCase();
     return [
       ApiOperation({ summary: `Overwrite a ${name} resource` }),
@@ -153,7 +164,8 @@ export namespace CrudifyRoutesDecorator {
       }),
     ];
   }
-  export function updateDecorators(options: ICrudify): any[] {
+
+  function updateDecorators(options: ICrudify): MethodDecorator[] {
     const name: string = options.model.type.name.toLowerCase();
     return [
       ApiOperation({ summary: `Update a ${name} resource` }),
@@ -174,7 +186,7 @@ export namespace CrudifyRoutesDecorator {
     ];
   }
 
-  export function updateBulkDecorators(options: ICrudify): any[] {
+  function updateBulkDecorators(options: ICrudify): MethodDecorator[] {
     const name: string = options.model.type.name.toLowerCase();
     return [
       ApiOperation({ summary: `Update multiple ${name} resources` }),
@@ -202,7 +214,7 @@ export namespace CrudifyRoutesDecorator {
     ];
   }
 
-  export function deleteDecorators(options: ICrudify): any[] {
+  function deleteDecorators(options: ICrudify): MethodDecorator[] {
     const name: string = options.model.type.name.toLowerCase();
     return [
       ApiOperation({ summary: `Delete a ${name} resource` }),
@@ -216,7 +228,7 @@ export namespace CrudifyRoutesDecorator {
     ];
   }
 
-  export function deleteBulkDecorators(options: ICrudify): any[] {
+  function deleteBulkDecorators(options: ICrudify): MethodDecorator[] {
     const name: string = options.model.type.name.toLowerCase();
     return [
       ApiOperation({ summary: `Delete multiple ${name} resources` }),

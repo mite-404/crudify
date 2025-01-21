@@ -8,8 +8,9 @@ import {
   Put,
   Query,
 } from "@nestjs/common";
-import { ICrudify } from "./crudify.interface";
+import { ICrudify } from "./interface/crudify.interface";
 import { CrudifyRoutesDecorator } from "./crudify.routesdecorator";
+import { ControllerMethods } from "./interface/controllermethods.type";
 export namespace CrudifyRoutes {
   export function routes(options: ICrudify) {
     return [
@@ -26,19 +27,21 @@ export namespace CrudifyRoutes {
   }
 
   function RouteFindAll(options: ICrudify) {
+    const methodName: ControllerMethods = "findAll";
     return {
-      methodName: "findAll",
+      methodName,
       httpMethod: Get,
       path: "/",
       parameters: [{ index: 0, decorator: Query(), type: Object }],
-      decorators: CrudifyRoutesDecorator.findAllDecorators(options),
+      decorators: CrudifyRoutesDecorator.getDecorators(options, methodName),
     };
   }
 
   function RouteFindOne(options: ICrudify) {
+    const methodName: ControllerMethods = "findAll";
     const name: string = options.model.type.name.toLowerCase();
     return {
-      methodName: "findOne",
+      methodName,
       httpMethod: Get,
       path: "/:id",
       parameters: [
@@ -49,25 +52,27 @@ export namespace CrudifyRoutes {
           description: `ID of the ${name} resource`,
         },
       ],
-      decorators: CrudifyRoutesDecorator.findOneDecorators(options),
+      decorators: CrudifyRoutesDecorator.getDecorators(options, methodName),
     };
   }
 
   function RouteCreate(options: ICrudify) {
+    const methodName: ControllerMethods = "findAll";
     const name: string = options.model.type.name.toLowerCase();
     return {
-      methodName: "create",
+      methodName,
       httpMethod: Post,
       path: "/",
       parameters: [{ index: 0, decorator: Body(), type: options.model.cdto }],
-      decorators: CrudifyRoutesDecorator.createDecorators(options),
+      decorators: CrudifyRoutesDecorator.getDecorators(options, methodName),
     };
   }
 
   function RouteCreateBulk(options: ICrudify) {
+    const methodName: ControllerMethods = "findAll";
     const name: string = options.model.type.name.toLowerCase();
     return {
-      methodName: "createBulk",
+      methodName,
       httpMethod: Post,
       path: "/bulk",
       parameters: [
@@ -78,14 +83,15 @@ export namespace CrudifyRoutes {
           description: `Array of ${name} resources to create`,
         },
       ],
-      decorators: CrudifyRoutesDecorator.createBulkDecorators(options),
+      decorators: CrudifyRoutesDecorator.getDecorators(options, methodName),
     };
   }
 
   function RoutePatch(options: ICrudify) {
+    const methodName: ControllerMethods = "findAll";
     const name: string = options.model.type.name.toLowerCase();
     return {
-      methodName: "update",
+      methodName,
       httpMethod: Patch,
       path: "/:id",
       parameters: [
@@ -97,14 +103,15 @@ export namespace CrudifyRoutes {
         },
         { index: 1, decorator: Body(), type: options.model.cdto },
       ],
-      decorators: CrudifyRoutesDecorator.updateDecorators(options),
+      decorators: CrudifyRoutesDecorator.getDecorators(options, methodName),
     };
   }
 
   function RoutePatchBulk(options: ICrudify) {
+    const methodName: ControllerMethods = "findAll";
     const name: string = options.model.type.name.toLowerCase();
     return {
-      methodName: "updateBulk",
+      methodName,
       httpMethod: Patch,
       path: "/bulk",
       parameters: [
@@ -115,14 +122,15 @@ export namespace CrudifyRoutes {
           description: `Object containing filter and data to update multiple ${name} resources`,
         },
       ],
-      decorators: CrudifyRoutesDecorator.updateBulkDecorators(options),
+      decorators: CrudifyRoutesDecorator.getDecorators(options, methodName),
     };
   }
 
   function RoutePut(options: ICrudify) {
+    const methodName: ControllerMethods = "findAll";
     const name: string = options.model.type.name.toLowerCase();
     return {
-      methodName: "overwrite",
+      methodName,
       httpMethod: Put,
       path: "/:id",
       parameters: [
@@ -134,14 +142,15 @@ export namespace CrudifyRoutes {
         },
         { index: 1, decorator: Body(), type: options.model.cdto },
       ],
-      decorators: CrudifyRoutesDecorator.overwriteDecorators(options),
+      decorators: CrudifyRoutesDecorator.getDecorators(options, methodName),
     };
   }
 
   function RouteDelete(options: ICrudify) {
+    const methodName: ControllerMethods = "findAll";
     const name: string = options.model.type.name.toLowerCase();
     return {
-      methodName: "delete",
+      methodName,
       httpMethod: Delete,
       path: "/:id",
       parameters: [
@@ -152,14 +161,15 @@ export namespace CrudifyRoutes {
           description: `ID of the ${name} resource`,
         },
       ],
-      decorators: CrudifyRoutesDecorator.deleteDecorators(options),
+      decorators: CrudifyRoutesDecorator.getDecorators(options, methodName),
     };
   }
 
   function RouteDeleteBulk(options: ICrudify) {
+    const methodName: ControllerMethods = "findAll";
     const name: string = options.model.type.name.toLowerCase();
     return {
-      methodName: "deleteBulk",
+      methodName,
       httpMethod: Delete,
       path: "/bulk",
       parameters: [
@@ -170,7 +180,7 @@ export namespace CrudifyRoutes {
           description: `Array of IDs of the ${name} resources to be deletedss`,
         },
       ],
-      decorators: CrudifyRoutesDecorator.deleteBulkDecorators(options),
+      decorators: CrudifyRoutesDecorator.getDecorators(options, methodName),
     };
   }
 }
