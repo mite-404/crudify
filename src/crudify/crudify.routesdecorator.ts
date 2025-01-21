@@ -21,37 +21,51 @@ export namespace CrudifyRoutesDecorator {
     const routeconfig: IRouteConfig | undefined =
       options.routes?.config?.[route];
 
-    if (options.routes?.exclude?.includes(route) || routeconfig?.disabled)
+    if (
+      options.routes?.exclude?.includes(route) ||
+      routeconfig?.disabled == true
+    )
       return [ApiExcludeEndpoint(), UseGuards(DisableRouteGuard)];
 
-    let routeDecorators: MethodDecorator[] = [];
-    switch (route) {
-      case "create":
-        routeDecorators = createDecorators(options);
-      case "createBulk":
-        routeDecorators = createBulkDecorators(options);
-      case "findAll":
-        routeDecorators = findAllDecorators(options);
-      case "findOne":
-        routeDecorators = findOneDecorators(options);
-      case "put":
-        routeDecorators = overwriteDecorators(options);
-      case "update":
-        routeDecorators = updateDecorators(options);
-      case "updateBulk":
-        routeDecorators = updateBulkDecorators(options);
-      case "delete":
-        routeDecorators = deleteDecorators(options);
-      case "deleteBulk":
-        routeDecorators = deleteBulkDecorators(options);
-      default:
-        routeDecorators = [];
-    }
+    let routeDecorators: MethodDecorator[] = getRouteDecorators(options, route);
 
+    const generalUserRouteDecorators: MethodDecorator[] =
+      options?.routes?.decorators || [];
     const userRouteDecorators: MethodDecorator[] =
       routeconfig?.decorators || [];
+    return [
+      ...routeDecorators,
+      ...generalUserRouteDecorators,
+      ...userRouteDecorators,
+    ];
+  }
 
-    return [...userRouteDecorators, ...routeDecorators];
+  function getRouteDecorators(
+    options: ICrudify,
+    route: ControllerMethods
+  ): MethodDecorator[] {
+    switch (route) {
+      case "create":
+        return createDecorators(options);
+      case "createBulk":
+        return createBulkDecorators(options);
+      case "findAll":
+        return findAllDecorators(options);
+      case "findOne":
+        return findOneDecorators(options);
+      case "put":
+        return overwriteDecorators(options);
+      case "update":
+        return updateDecorators(options);
+      case "updateBulk":
+        return updateBulkDecorators(options);
+      case "delete":
+        return deleteDecorators(options);
+      case "deleteBulk":
+        return deleteBulkDecorators(options);
+      default:
+        return [];
+    }
   }
 
   function createDecorators(options: ICrudify): MethodDecorator[] {

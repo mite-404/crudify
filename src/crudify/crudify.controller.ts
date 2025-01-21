@@ -35,8 +35,8 @@ export class CrudifyController<T> {
   }
 
   @Put(":id")
-  overwrite(@Param("id") id: string, @Body() updateDto: Partial<T>) {
-    return this.crudService.overwrite(id, updateDto);
+  put(@Param("id") id: string, @Body() updateDto: Partial<T>) {
+    return this.crudService.put(id, updateDto);
   }
 
   @Patch("/bulk")

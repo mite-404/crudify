@@ -11,6 +11,6 @@ export interface ICrudify {
   routes?: {
     config?: Partial<Record<ControllerMethods, IRouteConfig>>;
     exclude?: ControllerMethods[];
-    //TODO: aggiungere decorators
+    decorators?: MethodDecorator[];
   };
 }

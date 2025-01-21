@@ -39,7 +39,7 @@ export class CrudifyService<T> {
     return this.model.countDocuments(filter).exec();
   }
 
-  async overwrite(id: string, updateDto: UpdateQuery<T>): Promise<T | null> {
+  async put(id: string, updateDto: UpdateQuery<T>): Promise<T | null> {
     return this.model
       .findOneAndReplace({ _id: id }, updateDto, { new: true })
       .exec();
