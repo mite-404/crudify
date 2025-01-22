@@ -433,11 +433,11 @@ Add `_op=and` or `_op=or` to specify the logical operator for a field's conditio
 ### Examples
 
 ```
-# Emails that start with 'john' OR end with 'gmail.com'
+# Emails that start with 'john' AND end with 'gmail.com'
 /users?email[starts]=john&email[ends]=gmail.com
 
-# Emails that start with 'john' AND end with 'gmail.com'
-/users?email[starts]=john&email[ends]=gmail.com&email_op=and
+# Emails that start with 'john' OR end with 'gmail.com'
+/users?email[starts]=john&email[ends]=gmail.com&email_op=or
 
 # Mix AND/OR operations on different fields
 /users?email[starts]=john&email[ends]=gmail.com&email_op=and&status[in]=active,pending&status_op=or

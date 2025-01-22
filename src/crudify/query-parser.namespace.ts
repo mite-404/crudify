@@ -30,79 +30,36 @@ export class QueryParser {
     let skip = 0;
     let limit = 0;
 
-    // Oggetto per gestire le condizioni per campo
-    const conditions: Record<string, any[]> = {};
-    const logicalOperators: Record<string, "$and" | "$or"> = {};
-    const populateParams: Record<string, any> = {};
+    // Struttura per tenere traccia delle regex per campo
+    const regexPatterns: Record<
+      string,
+      {
+        starts?: string;
+        ends?: string;
+        cont?: string[];
+        isOr: boolean;
+      }
+    > = {};
 
     for (const [key, value] of Object.entries(queryParams)) {
-      // Gestione dei parametri di populate
-      if (key.startsWith("populate.")) {
-        const [_, field, param] = key.split(".");
-        if (!populateParams[field]) {
-          populateParams[field] = {
-            path: field,
-            select: undefined,
-            match: {},
-            sort: {},
-          };
-        }
-
-        if (param === "select" && typeof value === "string") {
-          populateParams[field].select = value.split(",").join(" ");
-        } else if (param === "sort" && typeof value === "string") {
-          const sortFields = value.split(",");
-          for (const field of sortFields) {
-            if (field.startsWith("-")) {
-              populateParams[field].sort[field.slice(1)] = -1;
-            } else {
-              populateParams[field].sort[field] = 1;
-            }
-          }
-        } else if (typeof value === "object" && !Array.isArray(value)) {
-          // Gestione dei filtri per i campi popolati
-          populateParams[field].match = {
-            ...populateParams[field].match,
-            [param]: this.parseFilters(value as Record<string, unknown>),
-          };
-        }
-        continue;
-      }
-
-      // Gestione populate semplice
-      if (key === "populate" && typeof value === "string") {
-        const paths = value.split(",");
-        for (const path of paths) {
-          if (path.includes(".")) {
-            // Gestione populate nested
-            const nestedPaths = path.split(".");
-            let currentPopulate: any = { path: nestedPaths[0] };
-            let currentNested = currentPopulate;
-
-            for (let i = 1; i < nestedPaths.length; i++) {
-              currentNested.populate = { path: nestedPaths[i] };
-              currentNested = currentNested.populate;
-            }
-
-            populate.push(currentPopulate);
-          } else {
-            populate.push({ path });
-          }
-        }
-        continue;
-      }
-
-      // Resto del codice esistente per filtri, sort, skip, limit...
+      // Gestione dell'operatore logico
       if (key.endsWith("_op") && typeof value === "string") {
         const fieldName = key.replace("_op", "");
-        logicalOperators[fieldName] =
-          value.toLowerCase() === "and" ? "$and" : "$or";
+        if (!regexPatterns[fieldName]) {
+          regexPatterns[fieldName] = {
+            cont: [],
+            isOr: value.toLowerCase() === "or",
+          };
+        } else {
+          regexPatterns[fieldName].isOr = value.toLowerCase() === "or";
+        }
         continue;
       }
 
       if (typeof value === "object" && !Array.isArray(value)) {
-        if (!conditions[key]) {
-          conditions[key] = [];
+        const fieldName = key;
+        if (!regexPatterns[fieldName]) {
+          regexPatterns[fieldName] = { cont: [], isOr: false }; // Default a AND
         }
 
         for (const [operator, operatorValue] of Object.entries(value as any)) {
@@ -111,29 +68,17 @@ export class QueryParser {
               ["starts", "ends", "cont"].includes(operator) &&
               typeof operatorValue === "string"
             ) {
-              let pattern = "";
-              if (operator === "starts") pattern = `^${operatorValue}`;
-              if (operator === "ends") pattern = `${operatorValue}$`;
-              if (operator === "cont") pattern = operatorValue;
-
-              conditions[key].push({
-                $regex: pattern,
-                $options: "i",
-              });
-            } else if (
-              operator === "excl" &&
-              typeof operatorValue === "string"
-            ) {
-              conditions[key].push({
-                $not: {
-                  $regex: operatorValue,
-                  $options: "i",
-                },
-              });
+              if (operator === "starts") {
+                regexPatterns[fieldName].starts = operatorValue;
+              } else if (operator === "ends") {
+                regexPatterns[fieldName].ends = operatorValue;
+              } else if (operator === "cont") {
+                regexPatterns[fieldName].cont?.push(operatorValue);
+              }
             } else if (operator === "isnull") {
-              conditions[key].push({ $exists: false });
+              filters[fieldName] = { $exists: false };
             } else if (operator === "notnull") {
-              conditions[key].push({ $exists: true });
+              filters[fieldName] = { $exists: true };
             } else if (
               operator === "between" &&
               typeof operatorValue === "string"
@@ -141,20 +86,24 @@ export class QueryParser {
               const [start, end] = operatorValue
                 .split(",")
                 .map((v) => this.castValue(v));
-              conditions[key].push({ $gte: start, $lte: end });
+              filters[fieldName] = { $gte: start, $lte: end };
+            } else if (
+              operator === "excl" &&
+              typeof operatorValue === "string"
+            ) {
+              filters[fieldName] = {
+                $not: { $regex: operatorValue, $options: "i" },
+              };
             } else {
               const mongoOperator = this.operatorsMap[operator];
-              const condition: Record<string, any> = {};
-              condition[mongoOperator] = this.castValue(operatorValue);
-              conditions[key].push(condition);
+              if (!filters[fieldName]) filters[fieldName] = {};
+              filters[fieldName][mongoOperator] = this.castValue(operatorValue);
             }
           }
         }
-
-        if (conditions[key].length > 0) {
-          const logicalOp = logicalOperators[key] || "$or";
-          filters[key] = { [logicalOp]: conditions[key] };
-        }
+      } else if (key === "populate" && typeof value === "string") {
+        const paths = value.split(",");
+        paths.forEach((path) => populate.push({ path }));
       } else if (key === "sort" && typeof value === "string") {
         const fields = value.split(",");
         for (const field of fields) {
@@ -179,28 +128,50 @@ export class QueryParser {
       }
     }
 
-    // Aggiungi i parametri di populate alle configurazioni esistenti
-    for (const [field, params] of Object.entries(populateParams)) {
-      const existingPopulate = populate.find((p) => p.path === field);
-      if (existingPopulate) {
-        Object.assign(existingPopulate, params);
+    // Processa i pattern regex
+    for (const [fieldName, patterns] of Object.entries(regexPatterns)) {
+      if (patterns.isOr) {
+        // Gestione OR
+        const conditions = [];
+        if (patterns.starts) {
+          conditions.push({
+            [fieldName]: { $regex: `^${patterns.starts}`, $options: "i" },
+          });
+        }
+        if (patterns.ends) {
+          conditions.push({
+            [fieldName]: { $regex: `${patterns.ends}$`, $options: "i" },
+          });
+        }
+        patterns.cont?.forEach((contPattern) => {
+          conditions.push({
+            [fieldName]: { $regex: contPattern, $options: "i" },
+          });
+        });
+        if (conditions.length > 0) {
+          filters.$or = conditions;
+        }
       } else {
-        populate.push(params);
+        // Gestione AND
+        let pattern = "";
+        if (patterns.starts) {
+          pattern += `^${patterns.starts}`;
+        }
+        if (patterns.cont?.length) {
+          patterns.cont.forEach((contPattern) => {
+            pattern += pattern ? `.*${contPattern}` : contPattern;
+          });
+        }
+        if (patterns.ends) {
+          pattern += pattern ? `.*${patterns.ends}$` : `${patterns.ends}$`;
+        }
+        if (pattern) {
+          filters[fieldName] = { $regex: pattern, $options: "i" };
+        }
       }
     }
 
     return { filters, populate, sort, skip, limit };
-  }
-
-  static parseFilters(filters: Record<string, unknown>): Record<string, any> {
-    const parsed: Record<string, any> = {};
-    for (const [operator, value] of Object.entries(filters)) {
-      if (this.operatorsMap[operator]) {
-        const mongoOperator = this.operatorsMap[operator];
-        parsed[mongoOperator] = this.castValue(value);
-      }
-    }
-    return parsed;
   }
 
   static castValue(value: unknown): any {
