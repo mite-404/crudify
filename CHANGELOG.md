@@ -7,9 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.0] - 2025-01-22
+### Added
+- **Custom Decorators:** Introduced support for custom decorators:
+  - **Route-Specific Decorators:** Define custom decorators for specific routes to enhance flexibility and control.
+  - **Generic Decorators:** Apply generic decorators across all routes for consistent functionality.
+
+### Fixed
+- **Filters Bug:** Resolved issues with filters that caused unexpected behavior in certain scenarios.
+- **Console Logging:** Logs are now properly printed to the console in addition to being stored in the database, improving debugging and monitoring capabilities.
+
+---
+
 ## [1.1.1] - 2025-01-20
-## Bug
-- **MongoDB URI Configuration**: Resolved an issue where the MongoDB URI was not being recognized properly when configuring the `CrudifyLoggerModule`. The default URI `mongodb://localhost:27017` with `logs` as the database is now used correctly.
+### Bug
+- **MongoDB URI Configuration:** Resolved an issue where the MongoDB URI was not being recognized properly when configuring the `CrudifyLoggerModule`. The default URI `mongodb://localhost:27017` with `logs` as the database is now used correctly.
   - You can now configure the module using `CrudifyLoggerModule.forRoot()` with a custom URI and database name:
     ```typescript
     CrudifyLoggerModule.forRoot({
@@ -17,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
       dbName: 'mydblogger',
     });
     ```
+
 ---
 
 ## [1.1.0] - 2025-01-17
@@ -46,3 +59,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 > **Note:** For any issues or feature requests, please open a ticket in the [GitHub repository](https://github.com/mitinoh/nest-crudify).
+
