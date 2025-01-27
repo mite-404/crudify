@@ -5,12 +5,12 @@ import {
   INestApplication,
 } from "@nestjs/common";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
-import { ISwaggerOptions } from "./swagger.interface";
+import { ISwaggerModuleOptions } from "./swagger.interface";
 
 @Module({})
 export class CrudifySwaggerModule implements OnModuleInit {
-  private static options: ISwaggerOptions;
-  static forRoot(options: ISwaggerOptions): DynamicModule {
+  private static options: ISwaggerModuleOptions;
+  static forRoot(options: ISwaggerModuleOptions): DynamicModule {
     this.options = options;
     return {
       module: CrudifySwaggerModule,
