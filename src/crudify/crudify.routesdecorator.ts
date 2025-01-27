@@ -108,6 +108,41 @@ export namespace CrudifyRoutesDecorator {
 
   function findAllDecorators(options: ICrudify): MethodDecorator[] {
     const name: string = options.model.type.name.toLowerCase();
+    let path_types:any = {
+      "String":"string",
+      "Number":"number",
+      "Date":"date",
+      "Buffer":"string",
+      "Boolean":"boolean",
+      "Mixed":"string",
+      "ObjectId":"string",
+      "Array":"array",
+      "Decimal128":"number",
+      "Map":"object",
+      "Schema":"object",
+      "UUID":"string",
+      "BigInt":"number",
+      "Double":"number",
+      "Int32":"number"
+    }
+    let list:any[] = []
+    if (options.model.schema) {
+      const fields = Object.keys(options.model.schema.paths);
+      const operators = ["eq", "ne", "gt", "gte", "lt", "lte", "in"];
+      fields.forEach((field) => {
+        let type = options.model.schema!.paths[field].instance
+        let path_type = path_types[type]
+        if(!path_type){path_type = "string"}
+        operators.forEach((operator) => {
+          list.push({[`${field}[${operator}]`]: {type: path_type}})
+        })
+      })
+    }
+    const patternProperties = list.reduce((acc, item) => {
+      const key = Object.keys(item)[0];
+      acc[key] = item[key];
+      return acc;
+    }, {});
     return [
       ApiOperation({ summary: `Retrieve all ${name} resources` }),
       ApiOkResponse({
@@ -116,10 +151,18 @@ export namespace CrudifyRoutesDecorator {
       }),
       ApiNotFoundResponse({ description: "Resources not found" }),
       ApiQuery({
-        name: "filter",
+        name: "filters",
         required: false,
-        type: String,
+        type: "object",
+        style: "form",
+        explode: true,
         description: "Filters to apply",
+        properties: patternProperties,
+        examples: {
+          void:{value:{}},
+          example:{value:{'filter_string[eq]':'filter_value','filter_num[gt]':-1}},
+        },
+        default: {},
       }),
       ApiQuery({
         name: "limit",
