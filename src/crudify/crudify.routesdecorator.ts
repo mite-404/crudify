@@ -1,5 +1,5 @@
 import { ICrudify } from "./interface/crudify.interface";
-import { UseGuards } from "@nestjs/common";
+import { UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
 import { DisableRouteGuard } from "./disable.guard";
 import {
   ApiOperation,
@@ -71,6 +71,7 @@ export namespace CrudifyRoutesDecorator {
   function createDecorators(options: ICrudify): MethodDecorator[] {
     const name: string = options.model.type.name.toLowerCase();
     return [
+      UsePipes(new ValidationPipe({ transform: true })),
       ApiOperation({ summary: `Create a ${name} resource` }),
       ApiCreatedResponse({
         description: `The resource  ${name} has been successfully created`,
@@ -90,6 +91,7 @@ export namespace CrudifyRoutesDecorator {
   function createBulkDecorators(options: ICrudify): MethodDecorator[] {
     const name: string = options.model.type.name.toLowerCase();
     return [
+      UsePipes(new ValidationPipe({ transform: true })),
       ApiOperation({ summary: `Create multiple ${name} resources` }),
       ApiCreatedResponse({
         description: "The resources have been created",
@@ -108,35 +110,37 @@ export namespace CrudifyRoutesDecorator {
 
   function findAllDecorators(options: ICrudify): MethodDecorator[] {
     const name: string = options.model.type.name.toLowerCase();
-    let path_types:any = {
-      "String":"string",
-      "Number":"number",
-      "Date":"date",
-      "Buffer":"string",
-      "Boolean":"boolean",
-      "Mixed":"string",
-      "ObjectId":"string",
-      "Array":"array",
-      "Decimal128":"number",
-      "Map":"object",
-      "Schema":"object",
-      "UUID":"string",
-      "BigInt":"number",
-      "Double":"number",
-      "Int32":"number"
-    }
-    let list:any[] = []
+    let path_types: any = {
+      String: "string",
+      Number: "number",
+      Date: "date",
+      Buffer: "string",
+      Boolean: "boolean",
+      Mixed: "string",
+      ObjectId: "string",
+      Array: "array",
+      Decimal128: "number",
+      Map: "object",
+      Schema: "object",
+      UUID: "string",
+      BigInt: "number",
+      Double: "number",
+      Int32: "number",
+    };
+    let list: any[] = [];
     if (options.model.schema) {
       const fields = Object.keys(options.model.schema.paths);
       const operators = ["eq", "ne", "gt", "gte", "lt", "lte", "in"];
       fields.forEach((field) => {
-        let type = options.model.schema!.paths[field].instance
-        let path_type = path_types[type]
-        if(!path_type){path_type = "string"}
+        let type = options.model.schema!.paths[field].instance;
+        let path_type = path_types[type];
+        if (!path_type) {
+          path_type = "string";
+        }
         operators.forEach((operator) => {
-          list.push({[`${field}[${operator}]`]: {type: path_type}})
-        })
-      })
+          list.push({ [`${field}[${operator}]`]: { type: path_type } });
+        });
+      });
     }
     const patternProperties = list.reduce((acc, item) => {
       const key = Object.keys(item)[0];
@@ -144,6 +148,7 @@ export namespace CrudifyRoutesDecorator {
       return acc;
     }, {});
     return [
+      UsePipes(new ValidationPipe({ transform: true })),
       ApiOperation({ summary: `Retrieve all ${name} resources` }),
       ApiOkResponse({
         description: `List of ${name} resources`,
@@ -159,8 +164,13 @@ export namespace CrudifyRoutesDecorator {
         description: "Filters to apply",
         properties: patternProperties,
         examples: {
-          void:{value:{}},
-          example:{value:{'filter_string[eq]':'filter_value','filter_num[gt]':-1}},
+          void: { value: {} },
+          example: {
+            value: {
+              "filter_string[eq]": "filter_value",
+              "filter_num[gt]": -1,
+            },
+          },
         },
         default: {},
       }),
@@ -188,6 +198,7 @@ export namespace CrudifyRoutesDecorator {
   function findOneDecorators(options: ICrudify): MethodDecorator[] {
     const name: string = options.model.type.name.toLowerCase();
     return [
+      UsePipes(new ValidationPipe({ transform: true })),
       ApiOperation({ summary: `Retrive a ${name} resource by ID` }),
       ApiOkResponse({
         description: `Resource ${name} found`,
@@ -205,6 +216,7 @@ export namespace CrudifyRoutesDecorator {
   function overwriteDecorators(options: ICrudify): MethodDecorator[] {
     const name: string = options.model.type.name.toLowerCase();
     return [
+      UsePipes(new ValidationPipe({ transform: true })),
       ApiOperation({ summary: `Overwrite a ${name} resource` }),
       ApiOkResponse({
         description: "The resource has been overwrited",
@@ -226,6 +238,7 @@ export namespace CrudifyRoutesDecorator {
   function updateDecorators(options: ICrudify): MethodDecorator[] {
     const name: string = options.model.type.name.toLowerCase();
     return [
+      UsePipes(new ValidationPipe({ transform: true })),
       ApiOperation({ summary: `Update a ${name} resource` }),
       ApiOkResponse({
         description: `The resource ${name} has been updated`,
@@ -247,6 +260,7 @@ export namespace CrudifyRoutesDecorator {
   function updateBulkDecorators(options: ICrudify): MethodDecorator[] {
     const name: string = options.model.type.name.toLowerCase();
     return [
+      UsePipes(new ValidationPipe({ transform: true })),
       ApiOperation({ summary: `Update multiple ${name} resources` }),
       ApiOkResponse({
         description: `The resources have been updated`,
