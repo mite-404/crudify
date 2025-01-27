@@ -10,6 +10,16 @@
   },
   "author": "Mite",
   "license": "MIT",
+  "homepage": "https://github.com/mitinoh/nest-crudify",
+  "keywords": [
+    "nestjs",
+    "crud",
+    "mongoose",
+    "nestjs-crud",
+    "api-generator",
+    "backend-tools",
+    "typescript"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "build:watch": "tsc -p tsconfig.json --watch",
