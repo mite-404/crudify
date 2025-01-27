@@ -1,4 +1,4 @@
-export interface ILoggerOptions {
+export interface ILoggerModuleOptions {
   uri?: string;
   dbName?: string;
 }

@@ -1,12 +1,12 @@
 import { DynamicModule, Module, OnModuleInit } from "@nestjs/common";
 import * as errsole from "errsole";
 import ErrsoleMongoDB from "errsole-mongodb";
-import { ILoggerOptions } from "./logger.interface";
+import { ILoggerModuleOptions } from "./logger.interface";
 
 @Module({})
 export class CrudifyLoggerModule implements OnModuleInit {
-  private static options: ILoggerOptions;
-  static forRoot(options: ILoggerOptions): DynamicModule {
+  private static options: ILoggerModuleOptions;
+  static forRoot(options: ILoggerModuleOptions): DynamicModule {
     this.options = {
       uri: options.uri || "mongodb://localhost:27017",
       dbName: options.dbName || "logs",
