@@ -1,6 +1,6 @@
 {
   "name": "ncrudify",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Configurable CRUD module for NestJS and Mongoose.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -10,6 +10,16 @@
   },
   "author": "Mite",
   "license": "MIT",
+  "homepage": "https://github.com/mitinoh/nest-crudify",
+  "keywords": [
+    "nestjs",
+    "crud",
+    "mongoose",
+    "nestjs-crud",
+    "api-generator",
+    "backend-tools",
+    "typescript"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "build:watch": "tsc -p tsconfig.json --watch",

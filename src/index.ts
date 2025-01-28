@@ -4,4 +4,3 @@ export * from "./crudify/crudify.decorator";
 export * from "./crudify/interface/crudify.interface";
 
 export * from "./logger/logger.module";
-export * from "./swagger/swagger.module";
