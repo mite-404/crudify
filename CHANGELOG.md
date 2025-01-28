@@ -71,5 +71,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-> **Note:** For any issues or feature requests, please open a ticket in the [GitHub repository](https://github.com/mitinoh/nest-crudify).
+> **Note:** For any issues or feature requests, please open a ticket in the [GitHub repository](https://github.com/mitinoh/crudify).
 

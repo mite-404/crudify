@@ -63,7 +63,7 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { UserModule } from "./user/user.module";
 
 @Module({
-	imports: [MongooseModule.forRoot(process.env.MONGODB_URI)],
+  imports: [MongooseModule.forRoot(process.env.MONGODB_URI)],
 })
 
 export class AppModule {}
@@ -81,21 +81,22 @@ import { Document, model, Model } from "mongoose";
 
 @Schema({ timestamps: true })
 export class User extends Document {
-	@ApiProperty({ example: "John Doe", description: "The name of the user" })
-	@Prop({ required: true })
-	name: string;
+  @ApiProperty({ example: "John Doe", description: "The name of the user" })
+  @Prop({ required: true })
+  name: string;
 
-	@ApiProperty({example: "test@gmail.com", description: "The email of the user"})
-	@Prop({ required: true, unique: true })
-	email: string;
+  @ApiProperty({example: "test@gmail.com", description: "The email of the user"})
+  @Prop({ required: true, unique: true })
+  email: string;
 
-	@ApiProperty({ example: 1, description: "The age of the user" })
-	@Prop({ required: false })
-	age: number;
+  @ApiProperty({ example: 1, description: "The age of the user" })
+  @Prop({ required: false })
+  age: number;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
-export const UserModel: Model<User> = model <User> ("User", UserSchema);
+export const UserModel: Model<User> = model<User> ("User", UserSchema);
+
 ```
 
  
@@ -113,9 +114,9 @@ import { CrudifyService } from 'ncrudify';
 
 @Injectable()
 export class UserService extends CrudifyService<User> {
-	constructor(@InjectModel(User.name) protected userModel: Model<User>) {
-		super(userModel);
-	}
+  constructor(@InjectModel(User.name) protected userModel: Model<User>) {
+    super(userModel);
+  }
 }
 ```
 
@@ -129,16 +130,16 @@ import { User, UserSchema } from './entities/user.entity';
 import { Crudify, CrudifyController } from 'ncrudify';
 
 @Crudify({
-	model: {
-		type: User,
-		schema: UserSchema
-	}
+  model: {
+    type: User,
+    schema: UserSchema
+  }
 })
 @Controller('users')
 export class UserController extends CrudifyController<User> {
-	constructor(public service: UserService) {
-		super(service);
-	}
+  constructor(public service: UserService) {
+    super(service);
+  }
 }
 ```
 
@@ -154,21 +155,19 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { UserSchema } from "./entities/user.entity";
 
 @Module({
-	imports: [MongooseModule.forFeature([{ name: "User", schema: UserSchema }])],
-	controllers: [UserController],
-	providers: [UserService],
+  imports: [MongooseModule.forFeature([{ name: "User", schema: UserSchema }])],
+  controllers: [UserController],
+  providers: [UserService],
 })
 
 export class UserModule {}
 ```
 ## Additional Configuration
 
-For more configurations and documentation, visit the [Crudify wiki](https://github.com/mitinoh/nest-crudify/wiki).
+For more configurations and documentation, visit the [Crudify wiki](https://github.com/mitinoh/crudify/wiki).
 
 
 ## Contributing
-
- 
 
 We love contributions! Whether you’ve spotted a bug or have an awesome idea, feel free to open an issue or submit a PR.
 

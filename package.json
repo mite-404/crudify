@@ -1,16 +1,16 @@
 {
   "name": "ncrudify",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Configurable CRUD module for NestJS and Mongoose.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mitinoh/nest-crudify.git"
+    "url": "https://github.com/mitinoh/crudify.git"
   },
   "author": "Mite",
   "license": "MIT",
-  "homepage": "https://github.com/mitinoh/nest-crudify",
+  "homepage": "https://github.com/mitinoh/crudify",
   "keywords": [
     "nestjs",
     "crud",
