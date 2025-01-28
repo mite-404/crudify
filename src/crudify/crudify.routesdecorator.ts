@@ -83,7 +83,7 @@ export namespace CrudifyRoutesDecorator {
       }),
       ApiBody({
         description: "Data of the new resource",
-        type: options.model.type,
+        type: options.model.cdto || options.model.type,
       }),
     ];
   }
@@ -103,7 +103,7 @@ export namespace CrudifyRoutesDecorator {
       }),
       ApiBody({
         description: "Data of the new resources",
-        type: [options.model.type],
+        type: [options.model.cdto || options.model.type],
       }),
     ];
   }
@@ -220,7 +220,7 @@ export namespace CrudifyRoutesDecorator {
       ApiOperation({ summary: `Overwrite a ${name} resource` }),
       ApiOkResponse({
         description: "The resource has been overwrited",
-        type: options.model.udto,
+        type: options.model.type,
       }),
       ApiBadRequestResponse({ description: "Invalid data" }),
       ApiParam({
@@ -230,7 +230,7 @@ export namespace CrudifyRoutesDecorator {
       }),
       ApiBody({
         description: "Overwrited data of the resource",
-        type: options.model.type,
+        type: options.model.udto || options.model.type,
       }),
     ];
   }
@@ -242,7 +242,7 @@ export namespace CrudifyRoutesDecorator {
       ApiOperation({ summary: `Update a ${name} resource` }),
       ApiOkResponse({
         description: `The resource ${name} has been updated`,
-        type: options.model.udto,
+        type: options.model.type,
       }),
       ApiBadRequestResponse({ description: "Invalid data" }),
       ApiParam({
@@ -252,7 +252,7 @@ export namespace CrudifyRoutesDecorator {
       }),
       ApiBody({
         description: "Updated data of the resource",
-        type: options.model.type,
+        type: options.model.udto || options.model.type,
       }),
     ];
   }
