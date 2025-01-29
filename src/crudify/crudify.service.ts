@@ -1,21 +1,22 @@
 import { Model, FilterQuery, UpdateQuery } from "mongoose";
 import { QueryParser } from "./query-parser.namespace";
 import { Injectable } from "@nestjs/common";
+import { IResponse } from "./interface/response.interface";
 
 @Injectable()
-export class CrudifyService<T> {
+export class CrudifyService<T, C = Partial<T>, U = Partial<T>> {
   constructor(protected readonly model: Model<T>) {}
 
-  async create(createDto: Partial<T>): Promise<T | any> {
+  async create(createDto: C): Promise<T | any> {
     const entity = new this.model(createDto);
     return entity.save();
   }
 
-  async createBulk(data: T[]): Promise<T[] | any> {
+  async createBulk(data: C[]): Promise<T[] | any> {
     return this.model.insertMany(data);
   }
 
-  async findAll(query: FilterQuery<T> = {}): Promise<any> {
+  async findAll(query: FilterQuery<T> = {}): Promise<IResponse<T>> {
     const { filters, populate, sort, skip, limit } = QueryParser.parse(query);
     const results = await this.model
       .find(filters)
@@ -30,7 +31,7 @@ export class CrudifyService<T> {
     return { results, total, page: Math.ceil(skip / limit) };
   }
 
-  async findOne(filter: FilterQuery<T>): Promise<T | null> {
+  async findOne(filter: FilterQuery<any>): Promise<T | null> {
     return this.model.findOne(filter).exec();
   }
 
@@ -38,17 +39,19 @@ export class CrudifyService<T> {
     return this.model.countDocuments(filter).exec();
   }
 
-  async put(id: string, updateDto: UpdateQuery<T>): Promise<T | null> {
+  async put(id: string, updateDto: UpdateQuery<U>): Promise<T | null> {
     return this.model
       .findOneAndReplace({ _id: id }, updateDto, { new: true })
       .exec();
   }
 
   async update(id: string, updateDto: UpdateQuery<T>): Promise<T | null> {
-    return this.model.findByIdAndUpdate(id, updateDto, { new: true }).exec();
+    return this.model
+      .findOneAndUpdate({ _id: id }, updateDto, { new: true })
+      .exec();
   }
 
-  async updateBulk(filter: any, updateDto: UpdateQuery<T>): Promise<any> {
+  async updateBulk(filter: any, updateDto: UpdateQuery<U>): Promise<any> {
     return this.model.updateMany(filter, { $set: updateDto }).exec();
   }
 

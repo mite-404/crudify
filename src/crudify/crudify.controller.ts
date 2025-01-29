@@ -11,16 +11,16 @@ import {
 } from "@nestjs/common";
 import { CrudifyService } from "./crudify.service";
 @Controller(":entity")
-export class CrudifyController<T> {
-  constructor(private readonly crudService: CrudifyService<T>) {}
+export class CrudifyController<T, C = Partial<T>, U = Partial<T>> {
+  constructor(private readonly crudService: CrudifyService<T, C, U>) {}
 
   @Post()
-  create(@Body() createDto: Partial<T>) {
+  create(@Body() createDto: C) {
     return this.crudService.create(createDto);
   }
 
   @Post("/bulk")
-  createBulk(@Body() data: T[]) {
+  createBulk(@Body() data: C[]) {
     return this.crudService.createBulk(data);
   }
 
@@ -35,7 +35,7 @@ export class CrudifyController<T> {
   }
 
   @Put(":id")
-  put(@Param("id") id: string, @Body() updateDto: Partial<T>) {
+  put(@Param("id") id: string, @Body() updateDto: Partial<U>) {
     return this.crudService.put(id, updateDto);
   }
 
