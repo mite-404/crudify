@@ -1,7 +1,6 @@
 import { applyDecorators } from "@nestjs/common";
 import { ICrudify } from "./interface/crudify.interface";
 import { CrudifyRoutes } from "./crudify.routes";
-
 export function Crudify<T>(options: ICrudify) {
   return function (constructor: Function) {
     const routes = CrudifyRoutes.routes(options);

@@ -63,7 +63,13 @@ export namespace CrudifyRoutes {
       methodName,
       httpMethod: Post,
       path: "/",
-      parameters: [{ index: 0, decorator: Body(), type: options.model.cdto }],
+      parameters: [
+        {
+          index: 0,
+          decorator: Body(),
+          type: options.model.cdto || options.model.type,
+        },
+      ],
       decorators: CrudifyRoutesDecorator.getDecorators(options, methodName),
     };
   }
@@ -79,7 +85,7 @@ export namespace CrudifyRoutes {
         {
           index: 0,
           decorator: Body(),
-          type: [options.model.cdto],
+          type: [options.model.cdto || options.model.type],
           description: `Array of ${name} resources to create`,
         },
       ],
@@ -101,7 +107,11 @@ export namespace CrudifyRoutes {
           type: String,
           description: `ID of the ${name} resource`,
         },
-        { index: 1, decorator: Body(), type: options.model.cdto },
+        {
+          index: 1,
+          decorator: Body(),
+          type: options.model.udto || options.model.type,
+        },
       ],
       decorators: CrudifyRoutesDecorator.getDecorators(options, methodName),
     };
@@ -140,7 +150,11 @@ export namespace CrudifyRoutes {
           type: String,
           description: `ID of the ${name} resource`,
         },
-        { index: 1, decorator: Body(), type: options.model.cdto },
+        {
+          index: 1,
+          decorator: Body(),
+          type: options.model.udto || options.model.type,
+        },
       ],
       decorators: CrudifyRoutesDecorator.getDecorators(options, methodName),
     };
@@ -176,7 +190,7 @@ export namespace CrudifyRoutes {
         {
           index: 0,
           decorator: Body(),
-          type: Array,
+          type: [String],
           description: `Array of IDs of the ${name} resources to be deletedss`,
         },
       ],
