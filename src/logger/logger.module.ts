@@ -8,7 +8,7 @@ export class CrudifyLoggerModule implements OnModuleInit {
   private static options: ILoggerModuleOptions;
   static forRoot(options: ILoggerModuleOptions): DynamicModule {
     this.options = {
-      uri: options.uri || "mongodb://localhost:27017",
+      uri: options.uri || "mongodb://localhost:27017/",
       dbName: options.dbName || "logs",
     };
     return {
@@ -18,7 +18,7 @@ export class CrudifyLoggerModule implements OnModuleInit {
 
   onModuleInit() {
     const mongoUri =
-      CrudifyLoggerModule.options?.uri || "mongodb://localhost:27017";
+      CrudifyLoggerModule.options?.uri || "mongodb://localhost:27017/";
     const dbName = CrudifyLoggerModule.options?.dbName || "logs";
     if (!mongoUri) {
       throw new Error("MongoDB URI not found");
