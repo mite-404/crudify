@@ -1,6 +1,6 @@
 {
   "name": "ncrudify",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Configurable CRUD module for NestJS and Mongoose.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

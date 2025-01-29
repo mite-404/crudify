@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ---
+## [1.2.3] - 2025-01-29
+### Added
+- **CrudifyController & CrudifyService:** Now supports CreateDto and UpdateDto.
+
+### Fix
+- **OpenApi:** Bug fix during openApi types generation.
+- **ErrsoleConf:** Fixed default uri.
+
+---
 ## [1.2.1] - 2025-01-28
 ### Added
 - **Example filter:** Added example filters in swaggerUI
