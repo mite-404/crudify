@@ -7,13 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ---
-## [1.2.3] - 2025-01-29
+## [1.2.3] - 
 ### Added
-- **CrudifyController & CrudifyService:** Now supports CreateDto and UpdateDto.
+- **CrudifyController & CrudifyService:** Added support for `CreateDto` and `UpdateDto` to handle creation and update operations more effectively.
 
 ### Fix
-- **OpenApi:** Bug fix during openApi types generation.
-- **ErrsoleConf:** Fixed default uri.
+- **OpenApi:** Fixed an issue with `OpenApi` types generation, ensuring that each route now has a unique operationId to prevent route duplication and improve Swagger documentation clarity.
+- **ErrsoleConf:** Resolved an issue with the default URI configuration, ensuring it now defaults correctly.
 
 ---
 ## [1.2.1] - 2025-01-28

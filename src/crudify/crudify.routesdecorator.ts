@@ -46,33 +46,39 @@ export namespace CrudifyRoutesDecorator {
   ): MethodDecorator[] {
     switch (route) {
       case "create":
-        return createDecorators(options);
+        return createDecorators(options, route);
       case "createBulk":
-        return createBulkDecorators(options);
+        return createBulkDecorators(options, route);
       case "findAll":
-        return findAllDecorators(options);
+        return findAllDecorators(options, route);
       case "findOne":
-        return findOneDecorators(options);
+        return findOneDecorators(options, route);
       case "put":
-        return overwriteDecorators(options);
+        return overwriteDecorators(options, route);
       case "update":
-        return updateDecorators(options);
+        return updateDecorators(options, route);
       case "updateBulk":
-        return updateBulkDecorators(options);
+        return updateBulkDecorators(options, route);
       case "delete":
-        return deleteDecorators(options);
+        return deleteDecorators(options, route);
       case "deleteBulk":
-        return deleteBulkDecorators(options);
+        return deleteBulkDecorators(options, route);
       default:
         return [];
     }
   }
 
-  function createDecorators(options: ICrudify): MethodDecorator[] {
+  function createDecorators(
+    options: ICrudify,
+    route: ControllerMethods
+  ): MethodDecorator[] {
     const name: string = options.model.type.name.toLowerCase();
     return [
       UsePipes(new ValidationPipe({ transform: true })),
-      ApiOperation({ summary: `Create a ${name} resource` }),
+      ApiOperation({
+        summary: `Create a ${name} resource`,
+        operationId: `${name}_${route}`,
+      }),
       ApiCreatedResponse({
         description: `The resource  ${name} has been successfully created`,
         type: options.model.type,
@@ -88,11 +94,17 @@ export namespace CrudifyRoutesDecorator {
     ];
   }
 
-  function createBulkDecorators(options: ICrudify): MethodDecorator[] {
+  function createBulkDecorators(
+    options: ICrudify,
+    route: ControllerMethods
+  ): MethodDecorator[] {
     const name: string = options.model.type.name.toLowerCase();
     return [
       UsePipes(new ValidationPipe({ transform: true })),
-      ApiOperation({ summary: `Create multiple ${name} resources` }),
+      ApiOperation({
+        summary: `Create multiple ${name} resources`,
+        operationId: `${name}_${route}`,
+      }),
       ApiCreatedResponse({
         description: "The resources have been created",
         type: [options.model.type],
@@ -108,12 +120,15 @@ export namespace CrudifyRoutesDecorator {
     ];
   }
 
-  function findAllDecorators(options: ICrudify): MethodDecorator[] {
+  function findAllDecorators(
+    options: ICrudify,
+    route: ControllerMethods
+  ): MethodDecorator[] {
     const name: string = options.model.type.name.toLowerCase();
     let path_types: any = {
       String: "string",
       Number: "number",
-      Date: "date",
+      Date: "string",
       Buffer: "string",
       Boolean: "boolean",
       Mixed: "string",
@@ -149,7 +164,10 @@ export namespace CrudifyRoutesDecorator {
     }, {});
     return [
       UsePipes(new ValidationPipe({ transform: true })),
-      ApiOperation({ summary: `Retrieve all ${name} resources` }),
+      ApiOperation({
+        summary: `Retrieve all ${name} resources`,
+        operationId: `${name}_${route}`,
+      }),
       ApiOkResponse({
         description: `List of ${name} resources`,
         type: [options.model.type],
@@ -195,11 +213,17 @@ export namespace CrudifyRoutesDecorator {
     ];
   }
 
-  function findOneDecorators(options: ICrudify): MethodDecorator[] {
+  function findOneDecorators(
+    options: ICrudify,
+    route: ControllerMethods
+  ): MethodDecorator[] {
     const name: string = options.model.type.name.toLowerCase();
     return [
       UsePipes(new ValidationPipe({ transform: true })),
-      ApiOperation({ summary: `Retrive a ${name} resource by ID` }),
+      ApiOperation({
+        summary: `Retrive a ${name} resource by ID`,
+        operationId: `${name}_${route}`,
+      }),
       ApiOkResponse({
         description: `Resource ${name} found`,
         type: options.model.type,
@@ -213,11 +237,17 @@ export namespace CrudifyRoutesDecorator {
     ];
   }
 
-  function overwriteDecorators(options: ICrudify): MethodDecorator[] {
+  function overwriteDecorators(
+    options: ICrudify,
+    route: ControllerMethods
+  ): MethodDecorator[] {
     const name: string = options.model.type.name.toLowerCase();
     return [
       UsePipes(new ValidationPipe({ transform: true })),
-      ApiOperation({ summary: `Overwrite a ${name} resource` }),
+      ApiOperation({
+        summary: `Overwrite a ${name} resource`,
+        operationId: `${name}_${route}`,
+      }),
       ApiOkResponse({
         description: "The resource has been overwrited",
         type: options.model.type,
@@ -235,11 +265,17 @@ export namespace CrudifyRoutesDecorator {
     ];
   }
 
-  function updateDecorators(options: ICrudify): MethodDecorator[] {
+  function updateDecorators(
+    options: ICrudify,
+    route: ControllerMethods
+  ): MethodDecorator[] {
     const name: string = options.model.type.name.toLowerCase();
     return [
       UsePipes(new ValidationPipe({ transform: true })),
-      ApiOperation({ summary: `Update a ${name} resource` }),
+      ApiOperation({
+        summary: `Update a ${name} resource`,
+        operationId: `${name}_${route}`,
+      }),
       ApiOkResponse({
         description: `The resource ${name} has been updated`,
         type: options.model.type,
@@ -257,11 +293,17 @@ export namespace CrudifyRoutesDecorator {
     ];
   }
 
-  function updateBulkDecorators(options: ICrudify): MethodDecorator[] {
+  function updateBulkDecorators(
+    options: ICrudify,
+    route: ControllerMethods
+  ): MethodDecorator[] {
     const name: string = options.model.type.name.toLowerCase();
     return [
       UsePipes(new ValidationPipe({ transform: true })),
-      ApiOperation({ summary: `Update multiple ${name} resources` }),
+      ApiOperation({
+        summary: `Update multiple ${name} resources`,
+        operationId: `${name}_${route}`,
+      }),
       ApiOkResponse({
         description: `The resources have been updated`,
         type: options.model.type,
@@ -286,10 +328,16 @@ export namespace CrudifyRoutesDecorator {
     ];
   }
 
-  function deleteDecorators(options: ICrudify): MethodDecorator[] {
+  function deleteDecorators(
+    options: ICrudify,
+    route: ControllerMethods
+  ): MethodDecorator[] {
     const name: string = options.model.type.name.toLowerCase();
     return [
-      ApiOperation({ summary: `Delete a ${name} resource` }),
+      ApiOperation({
+        summary: `Delete a ${name} resource`,
+        operationId: `${name}_${route}`,
+      }),
       ApiOkResponse({ description: "The resource has been deleted" }),
       ApiNotFoundResponse({ description: "Resource not found" }),
       ApiParam({
@@ -300,10 +348,16 @@ export namespace CrudifyRoutesDecorator {
     ];
   }
 
-  function deleteBulkDecorators(options: ICrudify): MethodDecorator[] {
+  function deleteBulkDecorators(
+    options: ICrudify,
+    route: ControllerMethods
+  ): MethodDecorator[] {
     const name: string = options.model.type.name.toLowerCase();
     return [
-      ApiOperation({ summary: `Delete multiple ${name} resources` }),
+      ApiOperation({
+        summary: `Delete multiple ${name} resources`,
+        operationId: `${name}_${route}`,
+      }),
       ApiOkResponse({ description: "The resources have been deleted" }),
       ApiNotFoundResponse({ description: "Some resources not found" }),
       ApiBadRequestResponse({
