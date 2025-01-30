@@ -94,6 +94,8 @@ export class QueryParser {
               filters[fieldName] = {
                 $not: { $regex: operatorValue, $options: "i" },
               };
+            } else if (operator === "in" && typeof operatorValue === "string") {
+              filters[fieldName] = { $in: operatorValue.split(",") };
             } else {
               const value: any =
                 operatorValue == "null" ? null : this.castValue(operatorValue);
