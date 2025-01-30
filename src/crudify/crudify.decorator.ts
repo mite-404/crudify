@@ -84,7 +84,6 @@ export function disableRoutes(
     }
     if (options.routes?.disableBulk) {
       options.routes.exclude.push("createBulk");
-      options.routes.exclude.push("putBulk");
       options.routes.exclude.push("updateBulk");
       options.routes.exclude.push("deleteBulk");
       options.routes.exclude.push("restoreBulk");

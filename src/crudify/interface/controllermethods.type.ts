@@ -4,7 +4,6 @@ export type ControllerMethods =
   | "findAll"
   | "findOne"
   | "put"
-  | "putBulk"
   | "update"
   | "updateBulk"
   | "delete"

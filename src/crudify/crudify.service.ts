@@ -80,7 +80,6 @@ export class CrudifyService<T, C = Partial<T>, U = Partial<T>> {
   }
 
   async restoreBulk(filter: any): Promise<any> {
-    console.log(filter);
     return this.model.updateMany(filter, { $set: { deletedAt: null } }).exec();
   }
 }
