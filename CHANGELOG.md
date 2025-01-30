@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ---
-## [1.2.3] - 
+## [1.2.3] - 2025-01-30
 ### Added
 - **CrudifyController & CrudifyService:** Added support for `CreateDto` and `UpdateDto` to handle creation and update operations more effectively.
 - **Soft Delete:** Implemented soft delete functionality, with routes for both single and bulk deletion.
