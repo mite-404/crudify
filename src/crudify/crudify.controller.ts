@@ -13,13 +13,14 @@ import { CrudifyService } from "./crudify.service";
 @Controller(":entity")
 export class CrudifyController<T, C = Partial<T>, U = Partial<T>> {
   constructor(private readonly crudService: CrudifyService<T, C, U>) {}
+  softDelete = Reflect.getMetadata("softDelete", this);
 
   @Post()
   create(@Body() createDto: C) {
     return this.crudService.create(createDto);
   }
 
-  @Post("/bulk")
+  @Post("bulk")
   createBulk(@Body() data: C[]) {
     return this.crudService.createBulk(data);
   }
@@ -39,10 +40,21 @@ export class CrudifyController<T, C = Partial<T>, U = Partial<T>> {
     return this.crudService.put(id, updateDto);
   }
 
-  @Patch("/bulk")
+  @Patch("bulk")
   async updateBulk(@Body() body: { filter: any; updateDto: any }) {
     const { filter, updateDto } = body;
     return this.crudService.updateBulk(filter, updateDto);
+  }
+
+  @Patch("bulk/restore")
+  async restoreBulk(@Body() body: { filter: any }) {
+    const { filter } = body;
+    return this.crudService.restoreBulk(filter);
+  }
+
+  @Patch(":id/restore")
+  restore(@Param("id") id: string) {
+    return this.crudService.restore(id);
   }
 
   @Patch(":id")
@@ -51,12 +63,15 @@ export class CrudifyController<T, C = Partial<T>, U = Partial<T>> {
   }
 
   @Delete("bulk")
-  async deleteBulk(@Body() ids: string[]) {
-    return this.crudService.deleteBulk(ids);
+  async deleteBulk(@Body() body: { filter: any }) {
+    const { filter } = body;
+    if (this.softDelete) return this.crudService.softDeleteBulk(filter);
+    return this.crudService.deleteBulk(filter);
   }
 
   @Delete(":id")
   delete(@Param("id") id: string) {
+    if (this.softDelete) return this.crudService.softDelete(id);
     return this.crudService.delete(id);
   }
 }

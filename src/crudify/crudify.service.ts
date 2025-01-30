@@ -59,7 +59,28 @@ export class CrudifyService<T, C = Partial<T>, U = Partial<T>> {
     return this.model.findByIdAndDelete(id).exec();
   }
 
-  async deleteBulk(ids: string[]): Promise<any> {
-    return this.model.deleteMany({ _id: { $in: ids } }).exec();
+  async deleteBulk(filter: any): Promise<any> {
+    return this.model.deleteMany(filter).exec();
+  }
+
+  async softDelete(id: string): Promise<T | null> {
+    return this.model
+      .findOneAndUpdate({ _id: id }, { deletedAt: new Date() }, { new: true })
+      .exec();
+  }
+
+  async softDeleteBulk(filter: any): Promise<any> {
+    return this.model
+      .updateMany(filter, { $set: { deletedAt: new Date() } })
+      .exec();
+  }
+
+  async restore(id: string): Promise<T | null> {
+    return this.model.findByIdAndUpdate(id, { deletedAt: null }, { new: true });
+  }
+
+  async restoreBulk(filter: any): Promise<any> {
+    console.log(filter);
+    return this.model.updateMany(filter, { $set: { deletedAt: null } }).exec();
   }
 }

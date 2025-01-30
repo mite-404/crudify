@@ -95,9 +95,11 @@ export class QueryParser {
                 $not: { $regex: operatorValue, $options: "i" },
               };
             } else {
+              const value: any =
+                operatorValue == "null" ? null : this.castValue(operatorValue);
               const mongoOperator = this.operatorsMap[operator];
               if (!filters[fieldName]) filters[fieldName] = {};
-              filters[fieldName][mongoOperator] = this.castValue(operatorValue);
+              filters[fieldName][mongoOperator] = value;
             }
           }
         }

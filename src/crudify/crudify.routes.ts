@@ -19,6 +19,8 @@ export namespace CrudifyRoutes {
       RouteCreate(options),
       RouteCreateBulk(options),
       RoutePatchBulk(options),
+      RouteRestoreBulk(options),
+      RouteRestore(options),
       RoutePatch(options),
       RoutePut(options),
       RouteDeleteBulk(options),
@@ -190,8 +192,46 @@ export namespace CrudifyRoutes {
         {
           index: 0,
           decorator: Body(),
-          type: [String],
-          description: `Array of IDs of the ${name} resources to be deletedss`,
+          type: Object,
+          description: `Object containing filter and data to delete multiple ${name} resources`,
+        },
+      ],
+      decorators: CrudifyRoutesDecorator.getDecorators(options, methodName),
+    };
+  }
+
+  function RouteRestore(options: ICrudify) {
+    const methodName: ControllerMethods = "restore";
+    const name: string = options.model.type.name.toLowerCase();
+    return {
+      methodName,
+      httpMethod: Patch,
+      path: "/:id/restore",
+      parameters: [
+        {
+          index: 0,
+          decorator: Param("id"),
+          type: String,
+          description: `ID of the ${name} resource`,
+        },
+      ],
+      decorators: CrudifyRoutesDecorator.getDecorators(options, methodName),
+    };
+  }
+
+  function RouteRestoreBulk(options: ICrudify) {
+    const methodName: ControllerMethods = "restoreBulk";
+    const name: string = options.model.type.name.toLowerCase();
+    return {
+      methodName,
+      httpMethod: Patch,
+      path: "/bulk/restore",
+      parameters: [
+        {
+          index: 0,
+          decorator: Body(),
+          type: Object,
+          description: `Object containing filter to restore multiple ${name} resources`,
         },
       ],
       decorators: CrudifyRoutesDecorator.getDecorators(options, methodName),

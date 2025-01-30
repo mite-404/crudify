@@ -63,6 +63,10 @@ export namespace CrudifyRoutesDecorator {
         return deleteDecorators(options, route);
       case "deleteBulk":
         return deleteBulkDecorators(options, route);
+      case "restore":
+        return restoreDecorators(options, route);
+      case "restoreBulk":
+        return restoreBulkDecorators(options, route);
       default:
         return [];
     }
@@ -362,6 +366,73 @@ export namespace CrudifyRoutesDecorator {
       ApiNotFoundResponse({ description: "Some resources not found" }),
       ApiBadRequestResponse({
         description: "Invalid input, expected an array of IDs",
+      }),
+      ApiBody({
+        description: `Object containing filter`,
+        schema: {
+          type: "object",
+          properties: {
+            filter: {
+              type: "object",
+              description: "Filter to select the resources to delete",
+            },
+          },
+        },
+      }),
+    ];
+  }
+
+  function restoreDecorators(
+    options: ICrudify,
+    route: ControllerMethods
+  ): MethodDecorator[] {
+    const name: string = options.model.type.name.toLowerCase();
+    return [
+      UsePipes(new ValidationPipe({ transform: true })),
+      ApiOperation({
+        summary: `Restore a ${name} resource`,
+        operationId: `${name}_${route}`,
+      }),
+      ApiOkResponse({
+        description: `The resource ${name} has been restored`,
+        type: options.model.type,
+      }),
+      ApiBadRequestResponse({ description: "Invalid data" }),
+      ApiParam({
+        name: "id",
+        description: `ID of the ${name} resource`,
+        type: String,
+      }),
+    ];
+  }
+
+  function restoreBulkDecorators(
+    options: ICrudify,
+    route: ControllerMethods
+  ): MethodDecorator[] {
+    const name: string = options.model.type.name.toLowerCase();
+    return [
+      UsePipes(new ValidationPipe({ transform: true })),
+      ApiOperation({
+        summary: `Restore multiple ${name} resources`,
+        operationId: `${name}_${route}`,
+      }),
+      ApiOkResponse({
+        description: `The resources have been restored`,
+        type: options.model.type,
+      }),
+      ApiBadRequestResponse({ description: "Invalid data" }),
+      ApiBody({
+        description: `Object containing filter`,
+        schema: {
+          type: "object",
+          properties: {
+            filter: {
+              type: "object",
+              description: "Filter to select the resources to restore",
+            },
+          },
+        },
       }),
     ];
   }
