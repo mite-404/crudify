@@ -322,7 +322,7 @@ export namespace CrudifyRoutesDecorator {
               type: "object",
               description: "Filter to select the resources to update",
             },
-            data: {
+            updateDto: {
               type: "object",
               description: "Data to apply to the selected resources",
             },
