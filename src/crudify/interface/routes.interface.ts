@@ -5,4 +5,5 @@ export interface ICrudifyRoutes {
   config?: Partial<Record<ControllerMethods, IRouteConfig>>;
   exclude?: ControllerMethods[];
   decorators?: MethodDecorator[];
+  disableBulk?: boolean;
 }

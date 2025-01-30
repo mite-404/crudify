@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **CrudifyController & CrudifyService:** Added support for `CreateDto` and `UpdateDto` to handle creation and update operations more effectively.
 - **Soft Delete:** Implemented soft delete functionality, with routes for both single and bulk deletion.
+- **DisableBulk:** Added `disableBulk` in routes.disableBulk to control bulk operations more granularly.
 
 ### Fix
 - **OpenApi:** Fixed an issue with `OpenApi` types generation, ensuring that each route now has a unique operationId to prevent route duplication and improve Swagger documentation clarity.

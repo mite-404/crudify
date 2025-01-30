@@ -3,20 +3,12 @@ import "reflect-metadata";
 import { ICrudify } from "./interface/crudify.interface";
 import { CrudifyRoutes } from "./crudify.routes";
 
-export function Crudify<T>(options: ICrudify & { softDelete?: boolean }) {
+export function Crudify<T>(options: ICrudify) {
   return function (target: Function) {
     const prototype = target.prototype;
     const basePrototype = Object.getPrototypeOf(prototype);
     const isSoftDelete = options.softDelete ?? false;
-
-    Reflect.defineMetadata("softDelete", isSoftDelete, prototype);
-
-    if (!isSoftDelete) {
-      if (options.routes?.exclude == undefined)
-        options.routes = { exclude: [] };
-      options.routes.exclude!.push("restore");
-      options.routes.exclude!.push("restoreBulk");
-    }
+    disableRoutes(options, prototype, isSoftDelete);
     const routes = CrudifyRoutes.routes(options);
     for (const route of routes) {
       let method = prototype[route.methodName];
@@ -72,4 +64,30 @@ export function Crudify<T>(options: ICrudify & { softDelete?: boolean }) {
       );
     }
   };
+}
+
+export function disableRoutes(
+  options: ICrudify,
+  prototype: any,
+  isSoftDelete: boolean
+) {
+  Reflect.defineMetadata("softDelete", isSoftDelete, prototype);
+  if (options.routes === undefined) options.routes = { exclude: [] };
+  if (options.routes?.exclude === undefined) {
+    options.routes.exclude = [];
+  }
+
+  if (Array.isArray(options.routes.exclude)) {
+    if (!isSoftDelete) {
+      options.routes.exclude.push("restore");
+      options.routes.exclude.push("restoreBulk");
+    }
+    if (options.routes?.disableBulk) {
+      options.routes.exclude.push("createBulk");
+      options.routes.exclude.push("putBulk");
+      options.routes.exclude.push("updateBulk");
+      options.routes.exclude.push("deleteBulk");
+      options.routes.exclude.push("restoreBulk");
+    }
+  }
 }
