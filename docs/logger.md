@@ -34,7 +34,7 @@ export class AppModule {}
 
 The `CrudifyLoggerModule.forRoot()` method accepts a configuration object with the following properties:
 
-- **`uri: string`**: The MongoDB connection URI where logs will be stored. Defaults to `mongodb://localhost:27017` .
+- **`uri: string`**: The MongoDB connection URI where logs will be stored. Defaults to `mongodb://127.0.0.1:27017` .
 - **`dbName: string`**: The name of the database where logs will be saved. Defaults to `logs`
 - **`disabled?: boolean`**: (Optional) Disable or no the logger.
 - **`options?: object`**: (Optional) Errsole options.
@@ -76,7 +76,7 @@ Once configured, the `CrudifyLoggerModule` will:
 By default, the logger listens on port `8001`. You can access the logs by navigating to:
 
 ```
-http://localhost:8001
+http://127.0.0.1:8001
 ```
 
 If you changed the port in the configuration, replace `8001` with your custom port.
@@ -97,6 +97,6 @@ If you changed the port in the configuration, replace `8001` with your custom po
 1. **Import `CrudifyLoggerModule`**: Add the logger module to your `AppModule` to enable error logging.
 2. **Configure MongoDB Connection**: Provide the MongoDB URI and database name for storing logs.
 3. **Customize Log Level and Port**: Adjust the log level and port as needed.
-4. **Access Logs**: View logs at `http://localhost:8001` (or your custom port).
+4. **Access Logs**: View logs at `http://127.0.0.1:8001` (or your custom port).
 
 By setting up the `CrudifyLoggerModule`, you can streamline your debugging process and ensure that all errors are logged and easily accessible. Let me know if you need further assistance! 🚀

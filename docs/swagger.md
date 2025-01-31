@@ -176,7 +176,7 @@ const config = new DocumentBuilder()
 Once your application is running, you can access the Swagger UI by navigating to:
 
 ```
-http://localhost:3000/api
+http://127.0.0.1:3000/api
 ```
 
 Here, you’ll see all your API endpoints, grouped by tags (if configured), and you can test them directly from the browser.
