@@ -5,8 +5,11 @@ import {
   ICrudifyModuleOptions,
 } from "./interface/crudifyoptions.interface";
 import { CrudifyLoggerModule } from "../logger/logger.module";
+import { HealthModule } from "../health/health.module";
 
-@Module({})
+@Module({
+  imports: [HealthModule],
+})
 export class CrudifyModule implements OnModuleInit {
   private static options: CrudifyModuleOptions;
   static forRoot(options: ICrudifyModuleOptions): DynamicModule {
