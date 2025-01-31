@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ---
+## [1.X.X] - 
+### Removed
+- **CrudifyLoggerModule:** Insted use `CrudifyModule`
+
+---
 ## [1.2.5] - 2025-01-30
 ### Fix
 - **QueryParser:** Fixed an issue with `in` operator.
