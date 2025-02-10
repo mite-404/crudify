@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ---
-## [1.X.X] - 
+## [1.2.6] - 2025-02-10 
 ### Removed
 - **CrudifyLoggerModule:** Insted use `CrudifyModule`
 
