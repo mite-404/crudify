@@ -30,6 +30,11 @@ export class CrudifyController<T, C = Partial<T>, U = Partial<T>> {
     return this.crudService.findAll(query);
   }
 
+  @Get("count")
+  count(@Query() query: any) {
+    return this.crudService.count(query);
+  }
+
   @Get(":id")
   findOne(@Param("id") id: string) {
     return this.crudService.findOne({ _id: id });

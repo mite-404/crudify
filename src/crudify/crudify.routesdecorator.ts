@@ -67,6 +67,8 @@ export namespace CrudifyRoutesDecorator {
         return restoreDecorators(options, route);
       case "restoreBulk":
         return restoreBulkDecorators(options, route);
+      case "count":
+        return countDecorators(options, route);
       default:
         return [];
     }
@@ -433,6 +435,23 @@ export namespace CrudifyRoutesDecorator {
             },
           },
         },
+      }),
+    ];
+  }
+
+  function countDecorators(
+    options: ICrudify,
+    route: ControllerMethods
+  ): MethodDecorator[] {
+    const name: string = options.model.type.name.toLowerCase();
+    return [
+      ApiOperation({
+        summary: `Retrive a total count of ${name} resources`,
+        operationId: `${name}_${route}`,
+      }),
+      ApiOkResponse({
+        description: `Total count of ${name} resources`,
+        type: Number,
       }),
     ];
   }

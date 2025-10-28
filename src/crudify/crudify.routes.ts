@@ -15,6 +15,7 @@ export namespace CrudifyRoutes {
   export function routes(options: ICrudify) {
     return [
       RouteFindAll(options),
+      RouteCount(options),
       RouteFindOne(options),
       RouteCreate(options),
       RouteCreateBulk(options),
@@ -35,6 +36,17 @@ export namespace CrudifyRoutes {
       httpMethod: Get,
       path: "/",
       parameters: [{ index: 0, decorator: Query(), type: Object }],
+      decorators: CrudifyRoutesDecorator.getDecorators(options, methodName),
+    };
+  }
+
+  function RouteCount(options: ICrudify) {
+    const methodName: ControllerMethods = "count";
+    return {
+      methodName,
+      httpMethod: Get,
+      path: "/count",
+      parameters: [],
       decorators: CrudifyRoutesDecorator.getDecorators(options, methodName),
     };
   }

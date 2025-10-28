@@ -9,4 +9,5 @@ export type ControllerMethods =
   | "delete"
   | "deleteBulk"
   | "restore"
-  | "restoreBulk";
+  | "restoreBulk"
+  | "count";
