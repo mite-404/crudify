@@ -65,7 +65,11 @@ export class CrudifyService<T, C = Partial<T>, U = Partial<T>> {
 
   async softDelete(id: string): Promise<T | null> {
     return this.model
-      .findOneAndUpdate({ _id: id }, { deletedAt: new Date() }, { new: true })
+      .findOneAndUpdate(
+        { _id: id },
+        { deletedAt: new Date() },
+        { new: true, strict: false }
+      )
       .exec();
   }
 

@@ -7,6 +7,7 @@ export type ControllerMethods =
   | "update"
   | "updateBulk"
   | "delete"
+  | "deleteSoft"
   | "deleteBulk"
   | "restore"
   | "restoreBulk"

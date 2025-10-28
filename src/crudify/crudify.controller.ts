@@ -79,4 +79,9 @@ export class CrudifyController<T, C = Partial<T>, U = Partial<T>> {
     if (this.softDelete) return this.crudService.softDelete(id);
     return this.crudService.delete(id);
   }
+
+  @Delete(":id/soft")
+  deleteSoft(@Param("id") id: string) {
+    return this.crudService.softDelete(id);
+  }
 }

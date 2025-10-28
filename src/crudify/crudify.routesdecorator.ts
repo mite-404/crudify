@@ -61,6 +61,8 @@ export namespace CrudifyRoutesDecorator {
         return updateBulkDecorators(options, route);
       case "delete":
         return deleteDecorators(options, route);
+      case "deleteSoft":
+        return deleteDecorators(options, route);
       case "deleteBulk":
         return deleteBulkDecorators(options, route);
       case "restore":

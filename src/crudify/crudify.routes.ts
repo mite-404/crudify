@@ -26,6 +26,7 @@ export namespace CrudifyRoutes {
       RoutePut(options),
       RouteDeleteBulk(options),
       RouteDelete(options),
+      RouteDeleteSoft(options),
     ];
   }
 
@@ -206,6 +207,25 @@ export namespace CrudifyRoutes {
           decorator: Body(),
           type: Object,
           description: `Object containing filter and data to delete multiple ${name} resources`,
+        },
+      ],
+      decorators: CrudifyRoutesDecorator.getDecorators(options, methodName),
+    };
+  }
+
+  function RouteDeleteSoft(options: ICrudify) {
+    const methodName: ControllerMethods = "deleteSoft";
+    const name: string = options.model.type.name.toLowerCase();
+    return {
+      methodName,
+      httpMethod: Delete,
+      path: "/:id/soft",
+      parameters: [
+        {
+          index: 0,
+          decorator: Param("id"),
+          type: String,
+          description: `ID of the ${name} resource`,
         },
       ],
       decorators: CrudifyRoutesDecorator.getDecorators(options, methodName),
