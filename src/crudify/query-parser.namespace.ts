@@ -85,7 +85,7 @@ export class QueryParser {
             ) {
               const [start, end] = operatorValue
                 .split(",")
-                .map((v) => this.castValue(v));
+                .map((v) => this.castValue(v.trim()));
               filters[fieldName] = { $gte: start, $lte: end };
             } else if (
               operator === "excl" &&
@@ -180,6 +180,11 @@ export class QueryParser {
 
   static castValue(value: unknown): any {
     if (typeof value === "string") {
+      const isoDateRegex =
+        /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?([+-]\d{2}:\d{2}|Z)?)?$/;
+      if (value.match(isoDateRegex)) {
+        return new Date(value);
+      }
       if (!isNaN(Number(value))) return Number(value);
       if (value === "true") return true;
       if (value === "false") return false;
