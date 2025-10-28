@@ -26,20 +26,20 @@
     "test": "jest"
   },
   "dependencies": {
-    "@nestjs/common": "^11.0.6",
+    "@nestjs/common": "^11.1.8",
     "errsole": "^2.12.0",
     "errsole-mongodb": "^2.2.0"
   },
   "peerDependencies": {
-    "@nestjs/core": "^11.0.6"
+    "@nestjs/core": "^11.1.8"
   },
   "devDependencies": {
-    "@nestjs/mongoose": "^11.0.1",
-    "@nestjs/swagger": "^11.0.3",
+    "@nestjs/mongoose": "^11.0.3",
+    "@nestjs/swagger": "^11.2.1",
     "@types/mongoose": "^5.11.96",
     "@types/swagger-ui-express": "^4.1.7",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
-    "mongoose": "^8.9.5"
+    "mongoose": "^8.19.2"
   }
 }
