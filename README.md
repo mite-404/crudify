@@ -73,6 +73,13 @@ export class AppModule {}
 ```
 ## Setup Crudify
 
+ Make sure to add the following line in your `main.ts` file to enable extended query parsing with Express:  
+ ```ts
+ app.set('query parser', 'extended');
+ ```  
+ Without this line, certain query parameters used by Crudify (such as nested filters or arrays) may not work correctly.
+
+
 ### Example
 - **Define your Mongoose model:**
 In this example, we define a `User` model using `@nestjs/mongoose` decorators and `@nestjs/swagger` for automatic API documentation.
