@@ -57,11 +57,6 @@ export class CrudifyController<T, C = Partial<T>, U = Partial<T>> {
     return this.crudService.restoreBulk(filter);
   }
 
-  @Patch(":id/restore")
-  restore(@Param("id") id: string) {
-    return this.crudService.restore(id);
-  }
-
   @Patch(":id")
   update(@Param("id") id: string, @Body() updateDto: Partial<T>) {
     return this.crudService.update(id, updateDto);
@@ -83,5 +78,10 @@ export class CrudifyController<T, C = Partial<T>, U = Partial<T>> {
   @Delete(":id/soft")
   deleteSoft(@Param("id") id: string) {
     return this.crudService.softDelete(id);
+  }
+
+  @Delete(":id/restore")
+  restore(@Param("id") id: string) {
+    return this.crudService.restore(id);
   }
 }

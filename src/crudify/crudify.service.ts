@@ -75,15 +75,27 @@ export class CrudifyService<T, C = Partial<T>, U = Partial<T>> {
 
   async softDeleteBulk(filter: any): Promise<any> {
     return this.model
-      .updateMany(filter, { $set: { deletedAt: new Date() } })
+      .updateMany(
+        filter,
+        { $set: { deletedAt: new Date() } },
+        { strict: false }
+      )
       .exec();
   }
 
   async restore(id: string): Promise<T | null> {
-    return this.model.findByIdAndUpdate(id, { deletedAt: null }, { new: true });
+    return this.model
+      .findByIdAndUpdate(
+        id,
+        { $unset: { deletedAt: null } },
+        { new: true, strict: false }
+      )
+      .exec();
   }
 
   async restoreBulk(filter: any): Promise<any> {
-    return this.model.updateMany(filter, { $set: { deletedAt: null } }).exec();
+    return this.model
+      .updateMany(filter, { $unset: { deletedAt: null } }, { strict: false })
+      .exec();
   }
 }

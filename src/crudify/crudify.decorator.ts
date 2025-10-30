@@ -78,10 +78,10 @@ export function disableRoutes(
   }
 
   if (Array.isArray(options.routes.exclude)) {
-    if (!isSoftDelete) {
-      options.routes.exclude.push("restore");
-      options.routes.exclude.push("restoreBulk");
-    }
+    // if (!isSoftDelete) {
+    //   options.routes.exclude.push("restore");
+    //   options.routes.exclude.push("restoreBulk");
+    // }
     if (options.routes?.disableBulk) {
       options.routes.exclude.push("createBulk");
       options.routes.exclude.push("updateBulk");

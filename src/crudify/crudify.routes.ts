@@ -16,12 +16,12 @@ export namespace CrudifyRoutes {
     return [
       RouteFindAll(options),
       RouteCount(options),
+      RouteRestore(options),
       RouteFindOne(options),
       RouteCreate(options),
       RouteCreateBulk(options),
       RoutePatchBulk(options),
       RouteRestoreBulk(options),
-      RouteRestore(options),
       RoutePatch(options),
       RoutePut(options),
       RouteDeleteBulk(options),
@@ -237,7 +237,7 @@ export namespace CrudifyRoutes {
     const name: string = options.model.type.name.toLowerCase();
     return {
       methodName,
-      httpMethod: Patch,
+      httpMethod: Delete,
       path: "/:id/restore",
       parameters: [
         {
