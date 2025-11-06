@@ -6,9 +6,10 @@ import {
 } from "./interface/crudifyoptions.interface";
 import { LoggerModule } from "../logger/logger.module";
 import { HealthModule } from "../health/health.module";
+import { ConfigModule } from "../config/config.module";
 
 @Module({
-  imports: [HealthModule, LoggerModule],
+  imports: [HealthModule, LoggerModule, ConfigModule],
 })
 export class CrudifyModule implements OnModuleInit {
   private static options: CrudifyModuleOptions;
