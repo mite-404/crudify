@@ -4,11 +4,11 @@ import {
   CrudifyModuleOptions,
   ICrudifyModuleOptions,
 } from "./interface/crudifyoptions.interface";
-import { CrudifyLoggerModule } from "../logger/logger.module";
+import { LoggerModule } from "../logger/logger.module";
 import { HealthModule } from "../health/health.module";
 
 @Module({
-  imports: [HealthModule],
+  imports: [HealthModule, LoggerModule],
 })
 export class CrudifyModule implements OnModuleInit {
   private static options: CrudifyModuleOptions;
@@ -20,6 +20,6 @@ export class CrudifyModule implements OnModuleInit {
   }
 
   onModuleInit() {
-    new CrudifyLoggerModule().initModule(CrudifyModule.options.logger);
+    new LoggerModule().initModule(CrudifyModule.options.logger);
   }
 }

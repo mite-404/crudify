@@ -1,7 +1,12 @@
+import { Module } from "@nestjs/common";
 import { LoggerModuleOptions } from "./logger.interface";
 import * as errsole from "errsole";
-
-export class CrudifyLoggerModule {
+import { LoggerController } from "./logger.controller";
+@Module({
+  controllers: [LoggerController],
+  providers: [],
+})
+export class LoggerModule {
   initModule(options: LoggerModuleOptions) {
     if (options?.disabled) return;
     if (!options.uri) {
