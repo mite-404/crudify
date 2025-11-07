@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),  
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.2] - 2025-11-07
+
+### Added
+- **Dynamic route configuration system:**  
+  Introduced a new `ConfigService` and `ConfigController` to dynamically enable or disable routes per model.  
+  - Routes can be toggled at runtime without redeploying the application.  
+  - Configuration is cached in memory for fast access and automatically loaded at startup.  
+
+- **Automatic route control:**  
+  The `CrudifyController` now checks route availability using `ConfigService.isRouteEnabled(model, route)` before executing a CRUD operation.
+
+- **Soft route blocking (no exception):**  
+  Instead of throwing an exception, disabled endpoints now return a structured JSON message:
+  ```json
+  {
+    "success": false,
+    "status": 403,
+    "message": "The route 'findAll' for model 'User' is currently disabled."
+  }
+  ```
+  This improves frontend handling and avoids unnecessary server errors.
+
+- **Interceptor support:**
+  Added an optional RouteAvailabilityInterceptor to centralize route availability checks for all controllers.
+  
 ## [1.3.1] - 2025-10-30
 
 ### Fix
