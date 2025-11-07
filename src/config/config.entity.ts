@@ -7,7 +7,7 @@ import { ControllerMethods } from "../crudify/interface/controllermethods.type";
 export class Config extends Document {
   @ApiProperty({
     description: "Unique name of the model this configuration applies to.",
-    example: "users",
+    example: "User",
   })
   @Prop({ required: true, unique: true })
   modelName!: string;
@@ -17,15 +17,17 @@ export class Config extends Document {
       "Defines which CRUD routes are enabled for this model. Each key represents a route (e.g. create, update, delete, list, get).",
     example: {
       create: true,
-      createBulk: false,
+      createBulk: true,
       findAll: true,
       findOne: true,
+      put: true,
       update: true,
-      delete: false,
+      updateBulk: true,
+      delete: true,
       deleteSoft: true,
-      deleteBulk: false,
+      deleteBulk: true,
       restore: true,
-      restoreBulk: false,
+      restoreBulk: true,
       count: true,
     },
     type: Object,
@@ -43,6 +45,15 @@ export class Config extends Document {
   })
   @Prop({ default: true })
   enabled?: boolean;
+
+  @ApiPropertyOptional({
+    description: "Other props",
+    type: Object,
+  })
+  @Prop({
+    type: Object,
+  })
+  props?: Partial<Record<string, any>>;
 }
 
 export const ConfigSchema = SchemaFactory.createForClass(Config);

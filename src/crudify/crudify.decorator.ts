@@ -8,6 +8,9 @@ export function Crudify<T>(options: ICrudify) {
     const prototype = target.prototype;
     const basePrototype = Object.getPrototypeOf(prototype);
     const isSoftDelete = options.softDelete ?? false;
+    Reflect.defineMetadata("model", options.model, prototype);
+    Reflect.defineMetadata("modelName", options.model.type.name, prototype);
+
     disableRoutes(options, prototype, isSoftDelete);
     const routes = CrudifyRoutes.routes(options);
     for (const route of routes) {

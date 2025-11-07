@@ -34,13 +34,10 @@ export class ConfigController {
     description: "Configuration cache retrieved successfully.",
     schema: {
       example: {
-        users: {
+        User: {
           enabled: true,
           routes: { create: true, update: false, delete: true },
-        },
-        orders: {
-          enabled: true,
-          routes: { create: true, update: true, delete: false },
+          props: { otherProp: "value" },
         },
       },
     },
@@ -58,7 +55,7 @@ export class ConfigController {
   @ApiParam({
     name: "model",
     description: "Model name ",
-    example: "users",
+    example: "User",
   })
   @ApiBody({
     description: "Partial configuration object for the given model.",
@@ -67,9 +64,21 @@ export class ConfigController {
         enabled: true,
         routes: {
           create: true,
-          update: false,
-          delete: false,
+          createBulk: true,
+          findAll: true,
+          findOne: true,
+          put: true,
+          update: true,
+          updateBulk: true,
+          delete: true,
+          deleteSoft: true,
+          deleteBulk: true,
+          restore: true,
+          restoreBulk: true,
+          count: true,
         },
+
+        props: { otherProp: "value" },
       },
     },
   })

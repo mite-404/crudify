@@ -1,9 +1,10 @@
-import { Module } from "@nestjs/common";
+import { Global, Module } from "@nestjs/common";
 import { ConfigController } from "./config.controller";
 import { MongooseModule } from "@nestjs/mongoose";
 import { Config, ConfigSchema } from "./config.entity";
 import { ConfigService } from "./config.service";
 
+@Global()
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Config.name, schema: ConfigSchema }]),

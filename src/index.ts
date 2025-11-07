@@ -8,3 +8,6 @@ export * from "./crudify/interface/response.interface";
 export * from "./crudify/interface/routes.interface";
 
 export * from "./crudify/crudify.module";
+
+export * from "./config/config.service";
+// export * from "./config/config.module";
