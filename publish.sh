@@ -46,8 +46,17 @@ echo "✅ Versione aggiornata: $CURRENT_VERSION → $NEW_VERSION"
 # === BUILD ===
 print_title "🏗️ Build della libreria"
 rm -rf dist
-# npm run build
 tsc -p tsconfig.json
+
+# === COPIA FILE STATICI ===
+print_title "🗂️ Copia dei file statici"
+FILES_TO_COPY=("README.md" "LICENSE" "package.json" "CHANGELOG.md")
+for file in "${FILES_TO_COPY[@]}"; do
+  if [[ -f "$file" ]]; then
+    cp "$file" dist/
+    echo "📄 Copiato $file"
+  fi
+done
 
 # === PACK ===
 print_title "🧪 Creazione pacchetto npm"
@@ -66,7 +75,7 @@ fi
 
 # === PUBBLICAZIONE ===
 print_title "🚀 Pubblicazione su npm"
-# npm publish --access public
+npm publish --access public
 cd ..
 
 print_title "✅ Pubblicato con successo $PACKAGE_NAME@$NEW_VERSION"
