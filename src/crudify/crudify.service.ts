@@ -1,4 +1,4 @@
-import { Model, FilterQuery, UpdateQuery } from "mongoose";
+import { Model, QueryFilter, UpdateQuery } from "mongoose";
 import { QueryParser } from "./query-parser.namespace";
 import { Injectable } from "@nestjs/common";
 import { IResponse } from "./interface/response.interface";
@@ -16,7 +16,7 @@ export class CrudifyService<T, C = Partial<T>, U = Partial<T>> {
     return this.model.insertMany(data);
   }
 
-  async findAll(query: FilterQuery<T> = {}): Promise<IResponse<T>> {
+  async findAll(query: QueryFilter<T> = {}): Promise<IResponse<T>> {
     const { filters, populate, sort, skip, limit } = QueryParser.parse(query);
     const results = await this.model
       .find(filters)
@@ -31,7 +31,7 @@ export class CrudifyService<T, C = Partial<T>, U = Partial<T>> {
     return { results, total, page: Math.ceil(skip / limit) };
   }
 
-  async findOne(filter: FilterQuery<any>): Promise<T | null> {
+  async findOne(filter: QueryFilter<any>): Promise<T | null> {
     return this.model.findOne(filter).exec();
   }
 

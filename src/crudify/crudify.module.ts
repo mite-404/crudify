@@ -1,26 +1,21 @@
-import { DynamicModule, Module, OnModuleInit } from "@nestjs/common";
+import { DynamicModule, Module } from "@nestjs/common";
 
 import {
   CrudifyModuleOptions,
   ICrudifyModuleOptions,
 } from "./interface/crudifyoptions.interface";
-import { LoggerModule } from "../logger/logger.module";
 import { HealthModule } from "../health/health.module";
 import { ConfigModule } from "../config/config.module";
 
 @Module({
-  imports: [HealthModule, LoggerModule, ConfigModule],
+  imports: [HealthModule, ConfigModule],
 })
-export class CrudifyModule implements OnModuleInit {
+export class CrudifyModule {
   private static options: CrudifyModuleOptions;
   static forRoot(options: ICrudifyModuleOptions): DynamicModule {
     this.options = new CrudifyModuleOptions(options);
     return {
       module: CrudifyModule,
     };
-  }
-
-  onModuleInit() {
-    new LoggerModule().initModule(CrudifyModule.options.logger);
   }
 }

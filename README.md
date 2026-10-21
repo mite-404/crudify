@@ -11,7 +11,6 @@ Let Crudify do the heavy lifting for you! With this simple yet powerful NestJS l
 - **Tired of repetitive code?** Crudify automatically generates the full set of CRUD operations for your Mongoose models. No more writing the same functions every time you need a new endpoint.
 - **Swagger documentation out of the box!** Crudify automatically generates a fully functional Swagger UI for your CRUD endpoints, making it easier for you and your team to test and document the API.
 - **Highly customizable?** Of course! You can extend and tweak the generated endpoints to meet your specific needs.
-- **Error handling made easy:** With an integrated logger, Crudify intercepts uncaught errors and makes debugging a breeze.
 - **Designed for NestJS:** Seamlessly integrates with your NestJS project, no friction, no fuss.
 ## Installation
 Ready to get started? Just install **Crudify** and let it work its magic:
@@ -23,7 +22,6 @@ npm install ncrudify
 
 - **No more boilerplate:** Generate Create, Read, Update, and Delete operations automatically.
 - **Swagger docs created for you:** Just like that, Swagger UI will be set up automatically to interact with your API, making testing and documentation seamless.
-- **Custom error handling:** Built-in error handling with easy logging configuration.
 - **Flexible:** Customize the generated code or add your business logic.
 - **NestJS integration:** Perfectly fits into your existing NestJS projects.
 
@@ -117,7 +115,7 @@ Extend `CrudifyService` to benefit from the automatically generated CRUD methods
 ```javascript
 import { Injectable } from '@nestjs/common';
 import { User } from './entities/user.entity';
-import { FilterQuery, Model } from 'mongoose';
+import { QueryFilter, Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { CrudifyService } from 'ncrudify';
 
