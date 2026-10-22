@@ -1,13 +1,6 @@
-import { CONST } from "../../shared/const.namespace";
+import { IAuditOptions } from "../../audit/audit.interface";
 
 export interface ICrudifyModuleOptions {
   uri?: string;
-}
-
-export class CrudifyModuleOptions implements ICrudifyModuleOptions {
-  uri?: string;
-
-  constructor(options: ICrudifyModuleOptions) {
-    this.uri = options?.uri || CONST.MONGO_URI;
-  }
+  audit?: boolean | IAuditOptions;
 }

@@ -2,17 +2,22 @@ import { applyDecorators } from "@nestjs/common";
 import "reflect-metadata";
 import { ICrudify } from "./interface/crudify.interface";
 import { CrudifyRoutes } from "./crudify.routes";
+import { NO_AUDIT_METADATA } from "../audit/audit.constants";
 
 export function Crudify<T>(options: ICrudify) {
   return function (target: Function) {
+    if (!options?.model?.type) {
+      throw new Error("@Crudify requires options.model.type");
+    }
+
     const prototype = target.prototype;
     const basePrototype = Object.getPrototypeOf(prototype);
     const isSoftDelete = options.softDelete ?? false;
     Reflect.defineMetadata("model", options.model, prototype);
     Reflect.defineMetadata("modelName", options.model.type.name, prototype);
 
-    disableRoutes(options, prototype, isSoftDelete);
-    const routes = CrudifyRoutes.routes(options);
+    const normalizedOptions = disableRoutes(options, prototype, isSoftDelete);
+    const routes = CrudifyRoutes.routes(normalizedOptions);
     for (const route of routes) {
       let method = prototype[route.methodName];
 
@@ -35,6 +40,18 @@ export function Crudify<T>(options: ICrudify) {
           const deleteDto = { deletedAt: new Date() };
           return originalMethod.apply(this, [entity, deleteDto]);
         };
+
+        const noAudit = Reflect.getMetadata(
+          NO_AUDIT_METADATA,
+          originalMethod
+        );
+        if (noAudit) {
+          Reflect.defineMetadata(
+            NO_AUDIT_METADATA,
+            noAudit,
+            prototype[route.methodName]
+          );
+        }
       }
 
       if (route.parameters) {
@@ -73,23 +90,23 @@ export function disableRoutes(
   options: ICrudify,
   prototype: any,
   isSoftDelete: boolean
-) {
+): ICrudify {
   Reflect.defineMetadata("softDelete", isSoftDelete, prototype);
-  if (options.routes === undefined) options.routes = { exclude: [] };
-  if (options.routes?.exclude === undefined) {
-    options.routes.exclude = [];
-  }
 
-  if (Array.isArray(options.routes.exclude)) {
-    // if (!isSoftDelete) {
-    //   options.routes.exclude.push("restore");
-    //   options.routes.exclude.push("restoreBulk");
-    // }
-    if (options.routes?.disableBulk) {
-      options.routes.exclude.push("createBulk");
-      options.routes.exclude.push("updateBulk");
-      options.routes.exclude.push("deleteBulk");
-      options.routes.exclude.push("restoreBulk");
+  const exclude = [...(options.routes?.exclude ?? [])];
+  if (options.routes?.disableBulk) {
+    for (const route of [
+      "createBulk",
+      "updateBulk",
+      "deleteBulk",
+      "restoreBulk",
+    ] as const) {
+      if (!exclude.includes(route)) exclude.push(route);
     }
   }
+
+  return {
+    ...options,
+    routes: options.routes ? { ...options.routes, exclude } : undefined,
+  };
 }

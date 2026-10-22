@@ -27,8 +27,9 @@ export class CrudifyService<T, C = Partial<T>, U = Partial<T>> {
       .exec();
 
     const total = await this.model.countDocuments(filters).exec();
+    const page = limit > 0 ? Math.floor(skip / limit) + 1 : 1;
 
-    return { results, total, page: Math.ceil(skip / limit) };
+    return { results, total, page };
   }
 
   async findOne(filter: QueryFilter<any>): Promise<T | null> {
@@ -67,7 +68,7 @@ export class CrudifyService<T, C = Partial<T>, U = Partial<T>> {
     return this.model
       .findOneAndUpdate(
         { _id: id },
-        { deletedAt: new Date() },
+        { $set: { deletedAt: new Date() } },
         { new: true, strict: false }
       )
       .exec();
@@ -87,7 +88,7 @@ export class CrudifyService<T, C = Partial<T>, U = Partial<T>> {
     return this.model
       .findByIdAndUpdate(
         id,
-        { $unset: { deletedAt: null } },
+        { $unset: { deletedAt: 1 } },
         { new: true, strict: false }
       )
       .exec();
@@ -95,7 +96,7 @@ export class CrudifyService<T, C = Partial<T>, U = Partial<T>> {
 
   async restoreBulk(filter: any): Promise<any> {
     return this.model
-      .updateMany(filter, { $unset: { deletedAt: null } }, { strict: false })
+      .updateMany(filter, { $unset: { deletedAt: 1 } }, { strict: false })
       .exec();
   }
 }

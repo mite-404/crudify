@@ -1,4 +1,4 @@
-import { Controller, Get } from "@nestjs/common";
+import { Controller, Get, ServiceUnavailableException } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { InjectConnection } from "@nestjs/mongoose";
 import { Connection } from "mongoose";
@@ -17,16 +17,24 @@ export class HealthController {
     type: HealthResponse,
   })
   @ApiResponse({ status: 500, description: "Internal server error" })
+  @ApiResponse({
+    status: 503,
+    description: "The database connection is not ready",
+  })
   checkHealth() {
-    const appStatus = "OK";
     const dbStatus = this.getDatabaseStatus();
-    const timestamp = new Date().toISOString();
-
-    return {
-      status: appStatus,
+    const healthy = dbStatus === "Connected";
+    const payload = {
+      status: healthy ? "OK" : "ERROR",
       database: dbStatus,
-      timestamp,
+      timestamp: new Date().toISOString(),
     };
+
+    if (!healthy) {
+      throw new ServiceUnavailableException(payload);
+    }
+
+    return payload;
   }
 
   private getDatabaseStatus() {

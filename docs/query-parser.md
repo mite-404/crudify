@@ -32,9 +32,24 @@ The parser supports the following filter operators:
 | excl     | Excludes (case insensitive)    | $not               | `name[excl]=test`                |
 | in       | In array                       | $in                | `status[in]=active,pending`      |
 | notin    | Not in array                   | $nin               | `status[notin]=deleted,archived` |
-| isnull   | Field is null/undefined        | $exists: false     | `deletedAt[isnull]=true`         |
-| notnull  | Field is not null/undefined    | $exists: true      | `email[notnull]=true`            |
+| isnull   | Field is null/undefined        | $eq: null          | `deletedAt[isnull]=true`         |
+| notnull  | Field is not null/undefined    | $ne: null          | `email[notnull]=true`            |
 | between  | Value is between (inclusive)   | $gte, $lte         | `age[between]=18,25`             |
+
+Values are automatically cast to numbers, booleans and dates when possible. Repeated
+parameters are converted to an `$in` filter:
+
+```
+/users?status=active&status=pending
+```
+
+Regular-expression operators (`starts`, `ends`, `cont`, `excl`) treat the input as
+literal text, so characters such as `.`, `+` and `*` are escaped automatically.
+`cont` also accepts an array of values, which are combined with AND:
+
+```
+/users?name[cont]=jo&name[cont]=hn
+```
 
 ### Examples
 
@@ -59,9 +74,9 @@ You can combine multiple conditions on the same field using logical operators (A
 ### Syntax
 Add `_op=and` or `_op=or` to specify the logical operator for a field's conditions.
 
-- Default behavior (without _op) is OR
-- Use `fieldname_op=and` for AND operations
-- Use `fieldname_op=or` for OR operations (explicit)
+- Default behavior (without `_op`) is AND
+- Use `fieldname_op=or` for OR operations
+- `fieldname_op=and` is optional and matches the default behavior
 
 ### Examples
 
@@ -72,8 +87,8 @@ Add `_op=and` or `_op=or` to specify the logical operator for a field's conditio
 # Emails that start with 'john' OR end with 'gmail.com'
 /users?email[starts]=john&email[ends]=gmail.com&email_op=or
 
-# Mix AND/OR operations on different fields
-/users?email[starts]=john&email[ends]=gmail.com&email_op=and&status[in]=active,pending&status_op=or
+# Combine conditions on different fields (AND by default)
+/users?email[starts]=john&email[ends]=gmail.com&status[in]=active,pending
 ```
 
 ## Sorting
@@ -133,30 +148,8 @@ Populate references to other collections with various options for controlling th
 /users?populate=posts.author,posts.comments
 ```
 
-### Advanced Population Options
-
-#### Select Specific Fields
-Choose which fields to include in populated documents:
-```
-/users?populate.posts.select=title,content,author
-```
-
-#### Filter Populated Documents
-Apply filters to populated documents:
-```
-/users?populate.posts.status[eq]=published
-```
-
-#### Sort Populated Documents
-Sort populated documents:
-```
-/users?populate.posts.sort=-createdAt
-```
-
-#### Combine Population Options
-```
-/users?populate.posts.select=title,content&populate.posts.status[eq]=published&populate.posts.sort=-createdAt
-```
+Only comma-separated paths are supported. Per-path options such as `select`,
+nested filters or sorting must be implemented in a custom service method.
 
 ## Complete Examples
 
@@ -190,9 +183,7 @@ This query will:
   title[cont]=javascript&
   status[eq]=published&
   tags[in]=tutorial,nodejs&
-  populate.author.select=name,email&
-  populate.comments.status[eq]=approved&
-  populate.comments.sort=-createdAt&
+  populate=author,comments&
   sort=-views,title&
   skip=20&
   limit=10
@@ -202,8 +193,7 @@ This query will:
 - Find posts containing "javascript" in the title
 - That are published
 - Tagged with either "tutorial" or "nodejs"
-- Populate author (only name and email)
-- Populate approved comments (sorted by creation date)
+- Populate author and comments
 - Sort results by views (descending) and title (ascending)
 - Skip first 20 results
 - Limit to 10 results

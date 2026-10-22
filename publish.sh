@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e  # Interrompe lo script se un comando fallisce
+set -eo pipefail  # Interrompe lo script se un comando fallisce
 
 # === FUNZIONI DI SUPPORTO ===
 function print_title() {
@@ -43,39 +43,34 @@ npm version "$VERSION_TYPE" --no-git-tag-version
 NEW_VERSION=$(node -p "require('./package.json').version")
 echo "✅ Versione aggiornata: $CURRENT_VERSION → $NEW_VERSION"
 
-# === BUILD ===
+# === TEST E BUILD ===
+print_title "🧪 Test della libreria"
+npm test
+
 print_title "🏗️ Build della libreria"
 rm -rf dist
-tsc -p tsconfig.json
-
-# === COPIA FILE STATICI ===
-print_title "🗂️ Copia dei file statici"
-FILES_TO_COPY=("README.md" "LICENSE" "package.json" "CHANGELOG.md")
-for file in "${FILES_TO_COPY[@]}"; do
-  if [[ -f "$file" ]]; then
-    cp "$file" dist/
-    echo "📄 Copiato $file"
-  fi
-done
+npm run build
 
 # === PACK ===
 print_title "🧪 Creazione pacchetto npm"
-cd dist
-npm pack
-PACKAGE_FILE=$(ls *.tgz)
+PACKAGE_FILE=$(npm pack --silent | tail -n1)
+if [[ ! -f "$PACKAGE_FILE" ]]; then
+  echo "❌ Creazione del pacchetto fallita."
+  exit 1
+fi
 echo "📄 Pacchetto generato: $PACKAGE_FILE"
 
 # === CONFERMA PUBBLICAZIONE ===
 read -p "Vuoi pubblicare $PACKAGE_NAME@$NEW_VERSION su npm? (y/n): " CONFIRM
 if [[ "$CONFIRM" != "y" ]]; then
   echo "❌ Pubblicazione annullata."
-  cd ..
+  rm -f "$PACKAGE_FILE"
   exit 0
 fi
 
 # === PUBBLICAZIONE ===
 print_title "🚀 Pubblicazione su npm"
-npm publish --access public
-cd ..
+npm publish "$PACKAGE_FILE" --access public
+rm -f "$PACKAGE_FILE"
 
 print_title "✅ Pubblicato con successo $PACKAGE_NAME@$NEW_VERSION"

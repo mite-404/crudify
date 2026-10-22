@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),  
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- Unit tests (Vitest) for the query parser, configuration service, CRUD service/controller and exception filter.
+- `CrudifyExceptionFilter` maps Mongoose cast/validation errors to `400` and duplicate-key errors to `409`.
+- Opt-in audit logging with a global interceptor, `@NoAudit()` exclusions, `audit_logs` persistence, `GET /audit` endpoints and an injectable `AuditService`.
+
+### Changed
+- Updated NestJS to `12.x`, Mongoose to `9.x`, Swagger to `12.x` and class-validator to `0.15.x`.
+- Runtime dependencies are now declared as peer dependencies.
+- The health endpoint returns `503` when MongoDB is not connected.
+- `enabled: false` in the configuration now disables every route for that model.
+- The configuration cache now includes `props`; `updateConfig` only persists `enabled`, `routes` and `props`.
+- The query parser now casts values for `in`/`notin`, escapes regular-expression input, accepts arrays for `cont`, combines multiple OR groups correctly and validates pagination values.
+
+### Fixed
+- The `/count` route now parses query filters with the same operators as `findAll`.
+- CRUD routes no longer return `undefined` when the `ConfigService` is unavailable.
+- Pagination now returns a one-based page and no longer produces `NaN` when `limit` is `0`.
+- Removed manual Mongoose model creation that could trigger `OverwriteModelError`.
+- The `@Crudify` decorator no longer mutates the options object supplied by the caller.
+- The npm package now points `main`/`types` to the files produced by the build instead of a nested `dist` directory.
+- Builds always emit output after `dist` is removed; the incremental cache could previously leave the package empty.
+
+### Removed
+- Removed `errsole`/`errsole-mongodb` and the errsole-based logger module and documentation.
+- Removed unused internal files and the deprecated `@types/mongoose` dependency.
+
 ## [1.4.0] - 2025-11-07
 
 ### Added

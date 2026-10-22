@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -88,11 +89,16 @@ export class ConfigController {
   })
   async updateConfig(
     @Param("model") model: string,
-    @Body() updates: Partial<Config>
+    @Body() updates: Partial<Config> = {}
   ) {
-    await this.configService.updateConfig(model, updates);
+    const normalizedModel = model?.trim();
+    if (!normalizedModel) {
+      throw new BadRequestException("Model name is required");
+    }
+
+    await this.configService.updateConfig(normalizedModel, updates ?? {});
     await this.configService.load();
-    return { success: true, model, updates };
+    return { success: true, model: normalizedModel, updates };
   }
 
   @Post("reload")

@@ -63,10 +63,14 @@ The ConfigService is responsible for:
 | Method                                                  | Description                                                   |
 | ------------------------------------------------------- | ------------------------------------------------------------- |
 | `load()`                                                | Loads all configurations from MongoDB and rebuilds the cache. |
-| `getAll()`                                              | Returns the current configuration cache.                      |
+| `getAll()`                                              | Returns the current configuration cache, including `props`.   |
 | `isRouteEnabled(model: string, route: string)`          | Returns true if the given route is enabled for the model.     |
 | `updateConfig(model: string, updates: Partial<Config>)` | Creates or updates a configuration for a specific model.      |
-| `notEnabledResponse(modelName: string, route: string)`  | Returns a standard 403 response when a route is disabled.     |
+| `notEnabledResponse(modelName: string, route: string)`  | Returns a structured payload with `status: 403` when a route is disabled. |
+
+Setting `enabled: false` disables every route for that model, regardless of the
+individual route flags. `updateConfig` only persists `enabled`, `routes` and
+`props`; `modelName` cannot be changed through this method.
 
 ### Example Usage
 
@@ -163,13 +167,17 @@ Crudify uses ConfigService internally to determine if routes are enabled before 
 
 ### Example Integration
 
+The built-in controller returns a structured payload instead of throwing:
+
 ```ts
 if (!this.configService.isRouteEnabled(modelName, routeName)) {
-  throw new ForbiddenException(this.configService.notEnabledResponse(modelName, routeName));
+  return this.configService.notEnabledResponse(modelName, routeName);
 }
 ```
 
-This ensures that disabling a route in the Config collection instantly prevents access to that route.
+If the `ConfigService` is not available (for example when `CrudifyModule` is not
+imported), routes remain enabled by default. When it is available, disabling a
+route in the Config collection instantly prevents access to that route.
 
 ---
 

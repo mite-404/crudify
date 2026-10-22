@@ -4,6 +4,10 @@
   "description": "Configurable CRUD module for NestJS and Mongoose.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/mitinoh/crudify.git"
@@ -23,22 +27,40 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "build:watch": "tsc -p tsconfig.json --watch",
-    "test": "jest"
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
-  "dependencies": {
-    "@nestjs/common": "^12.2.0"
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "overrides": {
+    "@istanbuljs/load-nyc-config": {
+      "js-yaml": "^4.1.0"
+    }
   },
   "peerDependencies": {
-    "@nestjs/core": "^12.2.0"
+    "@nestjs/common": "^12.0.0",
+    "@nestjs/core": "^12.0.0",
+    "@nestjs/mongoose": "^12.0.0",
+    "@nestjs/swagger": "^12.0.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "mongoose": "^9.0.0",
+    "reflect-metadata": "^0.2.0",
+    "rxjs": "^7.1.0"
   },
   "devDependencies": {
+    "@nestjs/common": "^12.2.0",
+    "@nestjs/core": "^12.2.0",
     "@nestjs/mongoose": "^12.0.0",
     "@nestjs/swagger": "^12.0.2",
     "@types/node": "^26.6.5",
-    "@types/swagger-ui-express": "^4.1.8",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
     "mongoose": "^9.11.2",
-    "typescript": "^6.0.3"
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.12"
   }
 }

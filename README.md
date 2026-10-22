@@ -18,6 +18,15 @@ Ready to get started? Just install **Crudify** and let it work its magic:
 ```bash
 npm install ncrudify
 ```
+
+### Requirements
+
+- Node.js `>=20.19.0`
+- NestJS `12.x`
+- Mongoose `9.x`
+- `@nestjs/mongoose` `12.x`
+- `@nestjs/swagger` `12.x`
+
 ## 🙌 Features
 
 - **No more boilerplate:** Generate Create, Read, Update, and Delete operations automatically.
@@ -29,15 +38,19 @@ npm install ncrudify
 
 Once you set it up, Crudify will handle these endpoints for you:
 
-- `POST /your-model:` Create a new record
-- `POST /your-model/bulk:` Create multiple new records
-- `GET /your-model:` Retrieve all records
-- `GET /your-model/:id:` Retrieve a specific record by ID
-- `PATCH /your-model/:id:` Update a record by ID
-- `PATCH /your-model/bulk` Update multiple records with filter in body
-- `PUT /your-model/:id:` Replace a record by ID
-- `DELETE /your-model/:id:` Delete a record by ID
+- `POST /your-model` Create a new record
+- `POST /your-model/bulk` Create multiple new records
+- `GET /your-model` Retrieve all records (supports filters, sorting and pagination)
+- `GET /your-model/count` Count records matching the query filters
+- `GET /your-model/:id` Retrieve a specific record by ID
+- `PATCH /your-model/:id` Update a record by ID
+- `PATCH /your-model/bulk` Update multiple records with a filter in the body
+- `PUT /your-model/:id` Replace a record by ID
+- `DELETE /your-model/:id` Delete a record by ID
+- `DELETE /your-model/:id/soft` Soft delete a record by ID
+- `DELETE /your-model/:id/restore` Restore a soft-deleted record
 - `DELETE /your-model/bulk` Delete multiple records
+- `PATCH /your-model/bulk/restore` Restore multiple soft-deleted records
 
 ## 💥 Get Started Now
 
@@ -57,16 +70,19 @@ npm install @nestjs/mongoose mongoose
 
 In your main application module (usually `app.module.ts`), import and configure the `MongooseModule` to connect to your MongoDB instance:
 
-```javascript
-
+```typescript
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
+import { CrudifyModule } from "ncrudify";
 import { UserModule } from "./user/user.module";
 
 @Module({
-	imports: [MongooseModule.forRoot(process.env.MONGODB_URI)],
+	imports: [
+		MongooseModule.forRoot(process.env.MONGODB_URI),
+		CrudifyModule.forRoot(),
+		UserModule,
+	],
 })
-
 export class AppModule {}
 ```
 ## Setup Crudify
@@ -82,10 +98,10 @@ export class AppModule {}
 - **Define your Mongoose model:**
 In this example, we define a `User` model using `@nestjs/mongoose` decorators and `@nestjs/swagger` for automatic API documentation.
 
-```javascript
+```typescript
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { ApiProperty } from "@nestjs/swagger";
-import { Document, model, Model } from "mongoose";
+import { Document } from "mongoose";
 
 @Schema({ timestamps: true })
 export class User extends Document {
@@ -103,7 +119,6 @@ export class User extends Document {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
-export const UserModel: Model<User> = model <User> ("User", UserSchema);
 ```
 
  
@@ -112,10 +127,10 @@ export const UserModel: Model<User> = model <User> ("User", UserSchema);
 
 Extend `CrudifyService` to benefit from the automatically generated CRUD methods. Override any methods if needed for custom logic, such as the `findAll` method in this example.
 
-```javascript
+```typescript
 import { Injectable } from '@nestjs/common';
 import { User } from './entities/user.entity';
-import { QueryFilter, Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { CrudifyService } from 'ncrudify';
 
@@ -130,7 +145,7 @@ export class UserService extends CrudifyService<User> {
 - **Create your controller:**
 Use the `@Crudify` decorator to automatically generate CRUD routes for the `User` model. You can still override specific methods like `findAll` as shown below.
 
-```javascript
+```typescript
 import { Controller, Get } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User, UserSchema } from './entities/user.entity';
@@ -154,7 +169,7 @@ export class UserController extends CrudifyController<User> {
 
 Set up the module to import `MongooseModule` and register the `User` schema, while also providing the service and controller.
 
-```javascript
+```typescript
 import { Module } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { UserController } from "./user.controller";
@@ -169,6 +184,49 @@ import { UserSchema } from "./entities/user.entity";
 
 export class UserModule {}
 ```
+## Runtime Configuration
+
+`CrudifyModule` exposes runtime configuration and health endpoints:
+
+- `GET /config` returns the configuration cache.
+- `PUT /config/:model` updates `enabled`, `routes` and `props` for a model.
+- `POST /config/reload` reloads the configuration cache from MongoDB.
+- `GET /health` checks the application and MongoDB connection status.
+
+Route configuration is cached in memory and is loaded at startup.
+
+## Audit Logging
+
+Audit logging is opt-in. Enable it through `CrudifyModule.forRoot()`:
+
+```typescript
+CrudifyModule.forRoot({
+	audit: {
+		enabled: true,
+		// collectionName: "audit_logs",
+		// userExtractor: (request) => request.user?.id,
+	},
+});
+```
+
+Every request is stored in the `audit_logs` collection with `user`, `action`,
+`entityId`, `details` (method, url, payload, oldDocument, statusCode, duration)
+and `createdAt`. Failed requests are logged too.
+
+Exclude a method or a whole controller with `@NoAudit`:
+
+```typescript
+@NoAudit("GET/:id")
+@Get(":id")
+findOne() {
+	// ...
+}
+```
+
+The module also exposes `GET /audit` to read logs and exports an injectable
+`AuditService` for manual logging. See [docs/audit.md](docs/audit.md) for the
+full reference.
+
 ## Additional Configuration
 
 For more configurations and documentation, visit the [Crudify wiki](https://github.com/mitinoh/crudify/tree/main/docs).

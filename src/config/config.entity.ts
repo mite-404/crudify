@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { Document, model, Model } from "mongoose";
+import { Document } from "mongoose";
 import { ControllerMethods } from "../crudify/interface/controllermethods.type";
 
 @Schema({ timestamps: true })
@@ -57,4 +57,3 @@ export class Config extends Document {
 }
 
 export const ConfigSchema = SchemaFactory.createForClass(Config);
-export const ConfigModel: Model<Config> = model<Config>("Config", ConfigSchema);
