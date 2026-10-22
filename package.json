@@ -10,11 +10,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/mitinoh/crudify.git"
+    "url": "https://github.com/mite-404/crudify.git"
   },
   "author": "Mite",
   "license": "MIT",
-  "homepage": "https://github.com/mitinoh/crudify",
+  "homepage": "https://github.com/mite-404/crudify",
   "keywords": [
     "nestjs",
     "crud",
@@ -28,7 +28,10 @@
     "build": "tsc -p tsconfig.json",
     "build:watch": "tsc -p tsconfig.json --watch",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build",
+    "release": "semantic-release",
+    "release:dry": "semantic-release --dry-run --no-ci"
   },
   "engines": {
     "node": ">=20.19.0"
@@ -54,12 +57,16 @@
     "@nestjs/core": "^12.2.0",
     "@nestjs/mongoose": "^12.0.0",
     "@nestjs/swagger": "^12.0.2",
+    "@semantic-release/changelog": "^7.0.0",
+    "@semantic-release/git": "^11.0.1",
     "@types/node": "^26.6.5",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
+    "conventional-changelog-conventionalcommits": "^9.3.1",
     "mongoose": "^9.11.2",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
+    "semantic-release": "^25.0.9",
     "typescript": "^6.0.3",
     "vitest": "^4.1.12"
   }

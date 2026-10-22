@@ -1,6 +1,6 @@
 # Crudify
 
-![npm](https://img.shields.io/npm/v/ncrudify?color=blue&label=npm&logo=npm) ![NestJS](https://img.shields.io/badge/NestJS-%23E0234E?logo=nestjs&logoColor=white) ![MongoDB](https://img.shields.io/badge/MongoDB-%2347A248?logo=mongodb&logoColor=white) ![GitHub last commit](https://img.shields.io/github/last-commit/mitinoh/nest-crudify) ![GitHub issues](https://img.shields.io/github/issues/mitinoh/nest-crudify) ![GitHub stars](https://img.shields.io/github/stars/mitinoh/nest-crudify?style=social)
+![npm](https://img.shields.io/npm/v/ncrudify?color=blue&label=npm&logo=npm) ![NestJS](https://img.shields.io/badge/NestJS-%23E0234E?logo=nestjs&logoColor=white) ![MongoDB](https://img.shields.io/badge/MongoDB-%2347A248?logo=mongodb&logoColor=white) ![GitHub last commit](https://img.shields.io/github/last-commit/mite-404/crudify) ![GitHub issues](https://img.shields.io/github/issues/mite-404/crudify) ![GitHub stars](https://img.shields.io/github/stars/mite-404/crudify?style=social)
 
 **Crudify** is a configurable CRUD generator for **NestJS** and **Mongoose**. It creates a complete set of REST endpoints for a Mongoose model, generates Swagger documentation, supports runtime route enable/disable, soft deletes, bulk operations, advanced query parsing and optional MongoDB-backed audit logging.
 
@@ -202,7 +202,7 @@ You now have a complete CRUD API under `/users`.
 | `DELETE` | `/users/bulk`                | Delete many records by filter                    |
 | `PATCH`  | `/users/bulk/restore`        | Restore many soft-deleted records by filter      |
 
-See [docs/routes.md](docs/routes.md) for request bodies, responses and curl examples.
+See [docs/routes.md](https://github.com/mite-404/crudify/blob/main/docs/routes.md) for request bodies, responses and curl examples.
 
 ## Core concepts
 
@@ -247,7 +247,7 @@ export class UserController extends CrudifyController<User> {}
 | `routes.decorators` | Decorators applied to every enabled route.                                  |
 | `routes.config`     | Per-route decorators and disabled flag.                                     |
 
-The complete reference is in [docs/crudify-decorator.md](docs/crudify-decorator.md).
+The complete reference is in [docs/crudify-decorator.md](https://github.com/mite-404/crudify/blob/main/docs/crudify-decorator.md).
 
 ### `CrudifyService`
 
@@ -263,7 +263,7 @@ async findAll(query: any) {
 }
 ```
 
-The complete service API is in [docs/api-reference.md](docs/api-reference.md).
+The complete service API is in [docs/api-reference.md](https://github.com/mite-404/crudify/blob/main/docs/api-reference.md).
 
 ### `CrudifyController`
 
@@ -309,7 +309,7 @@ curl -X PUT http://localhost:3000/config/User \
   }'
 ```
 
-Setting `enabled: false` disables every route for that model. Per-route flags are evaluated only when the model is enabled. See [docs/config.md](docs/config.md).
+Setting `enabled: false` disables every route for that model. Per-route flags are evaluated only when the model is enabled. See [docs/config.md](https://github.com/mite-404/crudify/blob/main/docs/config.md).
 
 ## Audit logging
 
@@ -358,7 +358,7 @@ Audit also exposes:
 - `GET /audit/:id` — read one audit log.
 - `AuditService` — injectable service for manual logging.
 
-See [docs/audit.md](docs/audit.md) for the complete reference.
+See [docs/audit.md](https://github.com/mite-404/crudify/blob/main/docs/audit.md) for the complete reference.
 
 ## Query language
 
@@ -370,7 +370,7 @@ GET /users?age[gte]=18&status[in]=active,pending&sort=-createdAt&limit=10&skip=2
 
 Supported operators include `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `starts`, `ends`, `cont`, `excl`, `in`, `notin`, `isnull`, `notnull` and `between`.
 
-The complete query language is documented in [docs/query-parser.md](docs/query-parser.md).
+The complete query language is documented in [docs/query-parser.md](https://github.com/mite-404/crudify/blob/main/docs/query-parser.md).
 
 ## Soft delete
 
@@ -455,7 +455,7 @@ SwaggerModule.setup("docs", app, document, {
 });
 ```
 
-See [docs/swagger.md](docs/swagger.md) for tags, authentication, route-specific decorators and disabled-route behavior.
+See [docs/swagger.md](https://github.com/mite-404/crudify/blob/main/docs/swagger.md) for tags, authentication, route-specific decorators and disabled-route behavior.
 
 ## Error handling
 
@@ -479,7 +479,7 @@ Response shape:
 }
 ```
 
-See [docs/exceptions.md](docs/exceptions.md).
+See [docs/exceptions.md](https://github.com/mite-404/crudify/blob/main/docs/exceptions.md).
 
 ## Health check
 
@@ -493,24 +493,24 @@ See [docs/exceptions.md](docs/exceptions.md).
 }
 ```
 
-When MongoDB is not connected, the endpoint returns `503 Service Unavailable` with the same payload shape. See [docs/health.md](docs/health.md).
+When MongoDB is not connected, the endpoint returns `503 Service Unavailable` with the same payload shape. See [docs/health.md](https://github.com/mite-404/crudify/blob/main/docs/health.md).
 
 ## Documentation
 
 | Document                                                 | Contents                                                      |
 | -------------------------------------------------------- | ------------------------------------------------------------- |
-| [Getting started](docs/getting-started.md)               | Installation, module setup and first CRUD API                 |
-| [Crudify decorator](docs/crudify-decorator.md)           | All `@Crudify` options and route customization                |
-| [Routes](docs/routes.md)                                 | Every generated endpoint with bodies, responses and examples  |
-| [Query parser](docs/query-parser.md)                     | Filters, operators, sorting, pagination and population        |
-| [Runtime configuration](docs/config.md)                  | Enable/disable models and routes at runtime                   |
-| [Audit logging](docs/audit.md)                           | Audit records, exclusions, reading logs and manual logging    |
-| [Swagger](docs/swagger.md)                               | Swagger setup, tags, auth and generated operations            |
-| [Exceptions](docs/exceptions.md)                         | Error mapping and response format                             |
-| [Health](docs/health.md)                                 | Health endpoint and connection states                         |
-| [API reference](docs/api-reference.md)                   | Exported classes, decorators, interfaces and method signatures|
-| [Migration to 1.5.0](docs/migration-1.5.0.md)            | Upgrade notes for the audit release                           |
-| [Troubleshooting](docs/troubleshooting.md)               | Common problems and solutions                                 |
+| [Getting started](https://github.com/mite-404/crudify/blob/main/docs/getting-started.md)               | Installation, module setup and first CRUD API                 |
+| [Crudify decorator](https://github.com/mite-404/crudify/blob/main/docs/crudify-decorator.md)           | All `@Crudify` options and route customization                |
+| [Routes](https://github.com/mite-404/crudify/blob/main/docs/routes.md)                                 | Every generated endpoint with bodies, responses and examples  |
+| [Query parser](https://github.com/mite-404/crudify/blob/main/docs/query-parser.md)                     | Filters, operators, sorting, pagination and population        |
+| [Runtime configuration](https://github.com/mite-404/crudify/blob/main/docs/config.md)                  | Enable/disable models and routes at runtime                   |
+| [Audit logging](https://github.com/mite-404/crudify/blob/main/docs/audit.md)                           | Audit records, exclusions, reading logs and manual logging    |
+| [Swagger](https://github.com/mite-404/crudify/blob/main/docs/swagger.md)                               | Swagger setup, tags, auth and generated operations            |
+| [Exceptions](https://github.com/mite-404/crudify/blob/main/docs/exceptions.md)                         | Error mapping and response format                             |
+| [Health](https://github.com/mite-404/crudify/blob/main/docs/health.md)                                 | Health endpoint and connection states                         |
+| [API reference](https://github.com/mite-404/crudify/blob/main/docs/api-reference.md)                   | Exported classes, decorators, interfaces and method signatures|
+| [Migration to 1.5.0](https://github.com/mite-404/crudify/blob/main/docs/migration-1.5.0.md)            | Upgrade notes for the audit release                           |
+| [Troubleshooting](https://github.com/mite-404/crudify/blob/main/docs/troubleshooting.md)               | Common problems and solutions                                 |
 
 ## Troubleshooting
 
@@ -520,11 +520,11 @@ When MongoDB is not connected, the endpoint returns `503 Service Unavailable` wi
 - **`oldDocument` is missing**: it is available only for `PATCH`, `PUT` and `DELETE` requests with an `id` param on controllers decorated with `@Crudify`.
 - **Soft-deleted records still appear**: `findAll` does not filter `deletedAt` automatically.
 
-See [docs/troubleshooting.md](docs/troubleshooting.md) for more.
+See [docs/troubleshooting.md](https://github.com/mite-404/crudify/blob/main/docs/troubleshooting.md) for more.
 
 ## Contributing
 
-Contributions are welcome. Open an issue or submit a pull request on [GitHub](https://github.com/mitinoh/crudify).
+Contributions are welcome. Open an issue or submit a pull request on [GitHub](https://github.com/mite-404/crudify).
 
 Before opening a pull request:
 
@@ -533,6 +533,8 @@ npm test
 npm run build
 ```
 
+Use [Conventional Commits](https://www.conventionalcommits.org/) for commit messages. Releases are automated with semantic-release; see [.github/RELEASE.md](https://github.com/mite-404/crudify/blob/main/.github/RELEASE.md).
+
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT. See [LICENSE](https://github.com/mite-404/crudify/blob/main/LICENSE).
