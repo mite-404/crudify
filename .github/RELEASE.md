@@ -81,4 +81,4 @@ If the allowed actions cannot be edited, delete the trusted publisher and create
 
 ### Tag and GitHub Release exist but npm has no matching version
 
-Push again or rerun the `Release` workflow. The workflow checks whether `package.json` has an existing tag missing from npm and publishes that version before semantic-release runs.
+Push again or rerun the `Release` workflow. The workflow checks whether `package.json` has an existing tag missing from npm and publishes that tagged source before semantic-release runs. After semantic-release, it verifies that the released version is on npm and publishes it if necessary.

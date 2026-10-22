@@ -101,8 +101,11 @@ jobs:
           if git rev-parse "v$VERSION" >/dev/null 2>&1; then
             PUBLISHED_VERSION=$(npm view "$PACKAGE_NAME@$VERSION" version --json 2>/dev/null | tr -d '[:space:]"' || true)
             if [ "$PUBLISHED_VERSION" != "$VERSION" ]; then
-              echo "Tag v$VERSION exists but $PACKAGE_NAME@$VERSION is not on npm; publishing"
-              npm publish --access public
+              echo "Tag v$VERSION exists but $PACKAGE_NAME@$VERSION is not on npm; publishing tagged source"
+              TMP_DIR=$(mktemp -d)
+              trap 'git worktree remove --force "$TMP_DIR/worktree" 2>/dev/null || true; rm -rf "$TMP_DIR"' EXIT
+              git worktree add --detach "$TMP_DIR/worktree" "v$VERSION"
+              (cd "$TMP_DIR/worktree" && npm ci && npm publish --access public)
             else
               echo "$PACKAGE_NAME@$VERSION is already published"
             fi
@@ -133,3 +136,15 @@ jobs:
         run: npm run release
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: Ensure released version is published to npm
+        run: |
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          VERSION=$(node -p "require('./package.json').version")
+          PUBLISHED_VERSION=$(npm view "$PACKAGE_NAME@$VERSION" version --json 2>/dev/null | tr -d '[:space:]"' || true)
+          if [ "$PUBLISHED_VERSION" = "$VERSION" ]; then
+            echo "$PACKAGE_NAME@$VERSION is already published"
+          else
+            echo "Publishing $PACKAGE_NAME@$VERSION"
+            npm publish --access public
+          fi
