@@ -5,6 +5,12 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      bootstrap:
+        description: Publish the current package.json version and create its tag and GitHub Release
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -48,7 +54,7 @@ jobs:
   release:
     name: Release
     needs: test
-    if: github.ref == 'refs/heads/main' && vars.RELEASE_ENABLED == 'true'
+    if: github.ref == 'refs/heads/main' && (inputs.bootstrap || vars.RELEASE_ENABLED == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -75,7 +81,37 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+      - name: Publish current version (bootstrap)
+        if: ${{ inputs.bootstrap }}
+        run: |
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          VERSION=$(node -p "require('./package.json').version")
+          if npm view "$PACKAGE_NAME@$VERSION" version >/dev/null 2>&1; then
+            echo "$PACKAGE_NAME@$VERSION is already published"
+          else
+            npm publish --access public
+          fi
+
+      - name: Create tag and GitHub Release (bootstrap)
+        if: ${{ inputs.bootstrap }}
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if git rev-parse "v$VERSION" >/dev/null 2>&1; then
+            echo "Tag v$VERSION already exists"
+          else
+            git tag "v$VERSION"
+            git push origin "v$VERSION"
+          fi
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
+            echo "Release v$VERSION already exists"
+          else
+            gh release create "v$VERSION" --title "v$VERSION" --notes "See CHANGELOG.md for details."
+          fi
+
       - name: Release
+        if: ${{ !inputs.bootstrap }}
         run: npm run release
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}

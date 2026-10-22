@@ -15,20 +15,9 @@ Releases are automated with [semantic-release](https://semantic-release.gitbook.
 
 Commits that do not produce a release (`docs`, `chore`, `ci`, `test`, etc.) do not change the version.
 
-> **First automated release:** the latest Git tag is `v1.4.0`, npm is at `1.4.1`, and `CHANGELOG.md` already contains a curated `1.5.0` section. To avoid a duplicate changelog entry, commit the automation with a non-releasing message and publish `1.5.0` once manually before pushing:
+> **First release (bootstrap):** the latest Git tag is `v1.4.0`, npm is at `1.4.1`, and `CHANGELOG.md` already contains a curated `1.5.0` section. After configuring the npm trusted publisher, run the `Release` workflow manually on `main` with the `bootstrap` input enabled. It publishes the current `package.json` version (`1.5.0`), creates the `v1.5.0` tag and the GitHub Release, and skips semantic-release so the curated changelog is not duplicated. The bootstrap is idempotent: already-published versions, tags and releases are skipped.
 >
-> ```bash
-> git add .
-> git commit -m "ci: add release automation"
-> npm test
-> npm run build
-> npm publish --access public
-> git tag v1.5.0
-> git push origin main
-> git push origin v1.5.0
-> ```
->
-> Future `feat`/`fix` commits are released automatically. If you prefer semantic-release to publish `1.5.0`, remove the manual `## [1.5.0]` section first and push a `feat` commit instead.
+> Then create the `RELEASE_ENABLED` variable. Future `feat`/`fix` commits are released automatically. If you prefer semantic-release to publish `1.5.0`, remove the manual `## [1.5.0]` section first and push a `feat` commit instead.
 
 ## Commit messages
 
@@ -59,7 +48,8 @@ Configure the trusted publisher on npmjs.com:
    - Workflow filename: `release.yml`
    - Environment: leave empty
 4. Save the configuration.
-5. On GitHub, open **Settings → Secrets and variables → Actions → Variables** and create `RELEASE_ENABLED` with value `true`. Until this variable exists, the release job is skipped and only the test job runs.
+5. Run the `Release` workflow manually with `bootstrap` enabled to publish `1.5.0`.
+6. On GitHub, open **Settings → Secrets and variables → Actions → Variables** and create `RELEASE_ENABLED` with value `true`. Until this variable exists, automatic releases on push are skipped and only the test job runs.
 
 Trusted publishing requires npm CLI `11.5.1` or later and Node.js `22.14.0` or later. The release job uses Node.js 24.
 
@@ -69,7 +59,10 @@ The release commit and tag are pushed with `GITHUB_TOKEN` by default. If `main` 
 
 ## Manual run
 
-Start the `Release` workflow from the Actions tab. It always runs the tests first and then attempts a release. If there are no releasable commits, semantic-release exits without publishing.
+Start the `Release` workflow from the Actions tab. It always runs the tests first.
+
+- Leave `bootstrap` unchecked for a normal semantic-release run. If there are no releasable commits, semantic-release exits without publishing.
+- Enable `bootstrap` only for the one-time baseline release of the current `package.json` version. It publishes that version, creates the matching tag and GitHub Release, and skips semantic-release.
 
 To preview locally:
 
