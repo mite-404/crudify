@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),  
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.1](https://github.com/mite-404/crudify/compare/v1.5.0...v1.5.1) (2026-10-22)
+
+### Bug Fixes
+
+* **crudify:** preserve atomic operators in updateBulk ([a8607e4](https://github.com/mite-404/crudify/commit/a8607e42d1cf850b0c27ed17663dda93d3fe75eb))
+
 ## [1.5.0] - 2026-10-22
 
 ### Added
@@ -163,4 +169,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 > **Note:** For any issues or feature requests, please open a ticket in the [GitHub repository](https://github.com/mite-404/crudify).
-
