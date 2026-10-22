@@ -78,3 +78,7 @@ GITHUB_TOKEN=... npm run release:dry
 The trusted publisher is not allowed to run a direct `npm publish`. Open the `ncrudify` package settings on npmjs.com, find the GitHub Actions trusted publisher and verify that **Allowed actions** includes **npm publish**. Configurations created after September 2026 allow only `npm stage publish` by default.
 
 If the allowed actions cannot be edited, delete the trusted publisher and create it again with the same repository, workflow filename and environment, this time enabling **npm publish**.
+
+### Tag and GitHub Release exist but npm has no matching version
+
+Push again or rerun the `Release` workflow. The workflow checks whether `package.json` has an existing tag missing from npm and publishes that version before semantic-release runs.

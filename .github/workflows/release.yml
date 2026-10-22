@@ -86,10 +86,28 @@ jobs:
         run: |
           PACKAGE_NAME=$(node -p "require('./package.json').name")
           VERSION=$(node -p "require('./package.json').version")
-          if npm view "$PACKAGE_NAME@$VERSION" version >/dev/null 2>&1; then
+          PUBLISHED_VERSION=$(npm view "$PACKAGE_NAME@$VERSION" version --json 2>/dev/null | tr -d '[:space:]"' || true)
+          if [ "$PUBLISHED_VERSION" = "$VERSION" ]; then
             echo "$PACKAGE_NAME@$VERSION is already published"
           else
             npm publish --access public
+          fi
+
+      - name: Repair missing npm publish for an existing tag
+        if: ${{ !inputs.bootstrap }}
+        run: |
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          VERSION=$(node -p "require('./package.json').version")
+          if git rev-parse "v$VERSION" >/dev/null 2>&1; then
+            PUBLISHED_VERSION=$(npm view "$PACKAGE_NAME@$VERSION" version --json 2>/dev/null | tr -d '[:space:]"' || true)
+            if [ "$PUBLISHED_VERSION" != "$VERSION" ]; then
+              echo "Tag v$VERSION exists but $PACKAGE_NAME@$VERSION is not on npm; publishing"
+              npm publish --access public
+            else
+              echo "$PACKAGE_NAME@$VERSION is already published"
+            fi
+          else
+            echo "Tag v$VERSION does not exist; semantic-release will handle the release"
           fi
 
       - name: Create tag and GitHub Release (bootstrap)
