@@ -1,121 +1,42 @@
-# Config Module
+# Runtime configuration
 
-The **Config Module** provides dynamic runtime control over which models and CRUD routes are enabled or disabled in the `Crudify` system. It stores configuration data in MongoDB, exposes REST endpoints to manage it, and maintains an in-memory cache for fast access.
+Crudify can enable or disable a model or individual CRUD routes at runtime. Configuration is stored in MongoDB and cached in memory by `ConfigService`.
 
----
+This is different from `@Crudify({ routes: { exclude: [...] } })`, which is evaluated when the application starts. Runtime configuration can change while the application is running.
 
-## 📦 Overview
+## How it works
 
-Each `Config` document represents the configuration for a single model. It defines:
-- Whether the model is globally enabled.
-- Which CRUD routes are individually enabled or disabled.
-- Any additional metadata (`props`) you want to attach.
+1. `ConfigModule` registers the `Config` Mongoose model.
+2. `ConfigService` loads all documents when the application starts (`OnModuleInit`).
+3. The cache is consulted by `CrudifyController` before every CRUD operation.
+4. `PUT /config/:model` and `POST /config/reload` update the database and reload the cache.
 
-This allows administrators to dynamically enable/disable features without redeploying the application.
+`ConfigModule` is global, so `ConfigService` can be injected anywhere.
 
----
-
-## 🧱 Entity: `Config`
+## `Config` entity
 
 ```ts
 @Schema({ timestamps: true })
 export class Config extends Document {
   @Prop({ required: true, unique: true })
-  modelName!: string; // The model this configuration applies to.
+  modelName!: string;
+
   @Prop({ type: Object })
-  routes?: Partial<Record<ControllerMethods, boolean>>; // CRUD route flags
+  routes?: Partial<Record<ControllerMethods, boolean>>;
+
   @Prop({ default: true })
-  enabled?: boolean; // Whether this model is globally active
+  enabled?: boolean;
+
   @Prop({ type: Object })
-  props?: Partial<Record<string, any>>; // Additional metadata
+  props?: Partial<Record<string, any>>;
 }
 ```
 
-### Example Document
+### Example document
 
 ```json
 {
   "modelName": "User",
-  "enabled": true,
-  "routes": {
-    "create": true,
-    "update": false,
-    "delete": true,
-    "restore": true
-  },
-  "props": {
-    "group": "admin"
-  }
-}
-```
-
----
-
-## ⚙️ ConfigService
-
-The ConfigService is responsible for:
-- Loading all configurations from MongoDB into an in-memory cache.
-- Checking route availability at runtime.
-- Updating configurations and reloading them dynamically.
-
-### Public Methods
-
-| Method                                                  | Description                                                   |
-| ------------------------------------------------------- | ------------------------------------------------------------- |
-| `load()`                                                | Loads all configurations from MongoDB and rebuilds the cache. |
-| `getAll()`                                              | Returns the current configuration cache, including `props`.   |
-| `isRouteEnabled(model: string, route: string)`          | Returns true if the given route is enabled for the model.     |
-| `updateConfig(model: string, updates: Partial<Config>)` | Creates or updates a configuration for a specific model.      |
-| `notEnabledResponse(modelName: string, route: string)`  | Returns a structured payload with `status: 403` when a route is disabled. |
-
-Setting `enabled: false` disables every route for that model, regardless of the
-individual route flags. `updateConfig` only persists `enabled`, `routes` and
-`props`; `modelName` cannot be changed through this method.
-
-### Example Usage
-
-```ts
-if (!this.configService.isRouteEnabled('User', 'delete')) {
-  return this.configService.notEnabledResponse('User', 'delete');
-}
-```
-
----
-
-## 🧭 ConfigController
-
-Base route: `/config`
-
-### GET `/config`
-
-Returns the current configuration cache for all models.
-
-#### Response Example
-
-```json
-{
-  "User": {
-    "enabled": true,
-    "routes": {
-      "create": true,
-      "update": false,
-      "delete": true
-    },
-    "props": {
-      "group": "admin"
-    }
-  }
-}
-```
-
-### PUT `/config/:model`
-
-Updates or creates a configuration for the specified model. If the configuration does not exist, it will be created automatically.
-
-#### Request Example
-
-```json
-{
   "enabled": true,
   "routes": {
     "create": true,
@@ -125,32 +46,215 @@ Updates or creates a configuration for the specified model. If the configuration
     "put": true,
     "update": true,
     "updateBulk": true,
-    "delete": true,
+    "delete": false,
     "deleteSoft": true,
-    "deleteBulk": true,
+    "deleteBulk": false,
     "restore": true,
     "restoreBulk": true,
     "count": true
   },
-  "props": { "otherProp": "value" }
+  "props": {
+    "group": "admin"
+  },
+  "createdAt": "2026-10-22T10:00:00.000Z",
+  "updatedAt": "2026-10-22T10:05:00.000Z"
 }
 ```
 
-#### Response
+### Route names
+
+The `routes` object accepts the following keys:
+
+```
+create
+createBulk
+findAll
+findOne
+put
+update
+updateBulk
+delete
+deleteSoft
+deleteBulk
+restore
+restoreBulk
+count
+```
+
+Unknown keys are stored but ignored by `isRouteEnabled`.
+
+## `ConfigService`
+
+```ts
+@Injectable()
+export class ConfigService {
+  load(): Promise<void>;
+  isRouteEnabled(model: string, route: string): boolean;
+  getAll(): Record<string, any>;
+  updateConfig(model: string, updates?: {
+    enabled?: boolean;
+    routes?: Partial<Record<ControllerMethods, boolean>>;
+    props?: Partial<Record<string, any>>;
+  }): Promise<void>;
+  notEnabledResponse(modelName: string, route: string): {
+    success: false;
+    status: 403;
+    message: string;
+  };
+}
+```
+
+### `load()`
+
+Reads every `Config` document and rebuilds the in-memory cache.
+
+```ts
+await configService.load();
+```
+
+`ConfigService` calls `load()` automatically during `onModuleInit`.
+
+### `isRouteEnabled(model, route)`
+
+Returns whether a route is enabled for a model.
+
+Logic:
+
+1. If no configuration exists for the model, return `true`.
+2. If `enabled === false`, return `false` for every route.
+3. Otherwise return `routes[route]`, defaulting to `true`.
+
+```ts
+if (!this.configService.isRouteEnabled("User", "delete")) {
+  return this.configService.notEnabledResponse("User", "delete");
+}
+```
+
+### `getAll()`
+
+Returns a copy of the current cache:
+
+```json
+{
+  "User": {
+    "enabled": true,
+    "routes": {
+      "delete": false
+    },
+    "props": {
+      "group": "admin"
+    }
+  }
+}
+```
+
+### `updateConfig(model, updates)`
+
+Creates or updates the configuration for a model. Only these fields are persisted:
+
+- `enabled`
+- `routes`
+- `props`
+
+`modelName` cannot be changed through this method. If no allowed field is present, the method returns without writing.
+
+```ts
+await this.configService.updateConfig("User", {
+  enabled: true,
+  routes: { delete: false },
+  props: { group: "admin" },
+});
+```
+
+### `notEnabledResponse(modelName, route)`
+
+Returns the response used by `CrudifyController` when a runtime route is disabled:
+
+```json
+{
+  "success": false,
+  "status": 403,
+  "message": "The route 'delete' for model 'User' is currently disabled."
+}
+```
+
+## `ConfigController`
+
+Base path: `/config`
+
+### `GET /config`
+
+Returns the current configuration cache.
+
+```bash
+curl http://localhost:3000/config
+```
+
+```json
+{
+  "User": {
+    "enabled": true,
+    "routes": {
+      "delete": false
+    },
+    "props": {
+      "group": "admin"
+    }
+  }
+}
+```
+
+### `PUT /config/:model`
+
+Creates or updates the configuration for a model and reloads the cache.
+
+```bash
+curl -X PUT http://localhost:3000/config/User \
+  -H "Content-Type: application/json" \
+  -d '{
+    "enabled": true,
+    "routes": {
+      "create": true,
+      "delete": false,
+      "deleteBulk": false
+    },
+    "props": {
+      "group": "admin"
+    }
+  }'
+```
+
+The `:model` path parameter must match the model name used by `@Crudify`, which is `model.type.name` (for example `User`).
+
+Response:
 
 ```json
 {
   "success": true,
   "model": "User",
-  "updates": { ... }
+  "updates": {
+    "enabled": true,
+    "routes": {
+      "create": true,
+      "delete": false,
+      "deleteBulk": false
+    },
+    "props": {
+      "group": "admin"
+    }
+  }
 }
 ```
 
-### POST `/config/reload`
+The record is created with an upsert if it does not exist.
 
-Forces a full reload of the configuration cache from the database.
+### `POST /config/reload`
 
-#### Response
+Reloads the cache from MongoDB.
+
+```bash
+curl -X POST http://localhost:3000/config/reload
+```
 
 ```json
 {
@@ -159,58 +263,36 @@ Forces a full reload of the configuration cache from the database.
 }
 ```
 
----
+## Disabling a whole model
 
-## 🧩 Integration with Crudify
-
-Crudify uses ConfigService internally to determine if routes are enabled before execution.
-
-### Example Integration
-
-The built-in controller returns a structured payload instead of throwing:
-
-```ts
-if (!this.configService.isRouteEnabled(modelName, routeName)) {
-  return this.configService.notEnabledResponse(modelName, routeName);
-}
+```bash
+curl -X PUT http://localhost:3000/config/User \
+  -H "Content-Type: application/json" \
+  -d '{"enabled":false}'
 ```
 
-If the `ConfigService` is not available (for example when `CrudifyModule` is not
-imported), routes remain enabled by default. When it is available, disabling a
-route in the Config collection instantly prevents access to that route.
+Every route for `User` returns the disabled-route response, regardless of individual route flags.
 
----
+## Runtime response vs build-time blocking
 
-## 🧰 Summary
+Runtime configuration does not throw an HTTP exception. `CrudifyController` returns the `notEnabledResponse` object, so the HTTP status is normally `200` and the body contains `status: 403`.
 
-| Component            | Description                                                                 |
-| -------------------- | --------------------------------------------------------------------------- |
-| **Config Entity**    | MongoDB schema defining per-model CRUD configuration                        |
-| **ConfigService**    | Handles caching, loading, and validation of route configuration             |
-| **ConfigController** | Provides REST API for reading and updating configuration                    |
-| **Integration**      | Used by CrudifyController to enforce route enable/disable logic dynamically |
+Build-time `routes.exclude` and `routes.config[route].disabled` use `DisableRouteGuard`, which blocks the request with an actual `403 Forbidden`.
 
----
+| Mechanism                                        | When evaluated | HTTP result                         |
+| ------------------------------------------------ | -------------- | ----------------------------------- |
+| `routes.exclude`                                 | Build time     | `403 Forbidden`                     |
+| `routes.config[route].disabled`                  | Build time     | `403 Forbidden`                     |
+| `Config.enabled: false`                          | Runtime        | `200` with `status: 403` in body    |
+| `Config.routes[route]: false`                    | Runtime        | `200` with `status: 403` in body    |
 
-## 🗄 Example MongoDB Collection
+## Security
 
-```json
-[
-  {
-    "modelName": "User",
-    "enabled": true,
-    "routes": { "create": true, "update": false, "delete": true },
-    "props": { "group": "admin" },
-    "createdAt": "2025-11-07T10:00:00Z",
-    "updatedAt": "2025-11-07T10:05:00Z"
-  },
-  {
-    "modelName": "Product",
-    "enabled": false,
-    "routes": { "findAll": false, "findOne": false },
-    "props": {},
-    "createdAt": "2025-11-07T09:00:00Z",
-    "updatedAt": "2025-11-07T09:30:00Z"
-  }
-]
-```
+The `/config` endpoints are not protected by Crudify. Protect them with your own authentication and authorization guards, for example by applying a global guard or by wrapping the controller in your application.
+
+## Related documentation
+
+- [Routes](routes.md)
+- [Crudify decorator](crudify-decorator.md)
+- [API reference](api-reference.md)
+- [Troubleshooting](troubleshooting.md)

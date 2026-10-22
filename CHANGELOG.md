@@ -7,10 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-10-22
+
 ### Added
 - Unit tests (Vitest) for the query parser, configuration service, CRUD service/controller and exception filter.
 - `CrudifyExceptionFilter` maps Mongoose cast/validation errors to `400` and duplicate-key errors to `409`.
 - Opt-in audit logging with a global interceptor, `@NoAudit()` exclusions, `audit_logs` persistence, `GET /audit` endpoints and an injectable `AuditService`.
+- Complete English documentation set under `docs/`, including getting started, routes, query parser, runtime configuration, audit logging, Swagger, exceptions, health, API reference, migration notes and troubleshooting.
 
 ### Changed
 - Updated NestJS to `12.x`, Mongoose to `9.x`, Swagger to `12.x` and class-validator to `0.15.x`.
