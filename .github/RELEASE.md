@@ -47,6 +47,7 @@ Configure the trusted publisher on npmjs.com:
    - Repository: `crudify`
    - Workflow filename: `release.yml`
    - Environment: leave empty
+   - Allowed actions: enable **npm publish** (direct publish). New trusted publishers created after September 2026 allow only `npm stage publish` by default.
 4. Save the configuration.
 5. Run the `Release` workflow manually with `bootstrap` enabled to publish `1.5.0`.
 6. On GitHub, open **Settings → Secrets and variables → Actions → Variables** and create `RELEASE_ENABLED` with value `true`. Until this variable exists, automatic releases on push are skipped and only the test job runs.
@@ -69,3 +70,11 @@ To preview locally:
 ```bash
 GITHUB_TOKEN=... npm run release:dry
 ```
+
+## Troubleshooting
+
+### `403 OIDC permission denied for this action`
+
+The trusted publisher is not allowed to run a direct `npm publish`. Open the `ncrudify` package settings on npmjs.com, find the GitHub Actions trusted publisher and verify that **Allowed actions** includes **npm publish**. Configurations created after September 2026 allow only `npm stage publish` by default.
+
+If the allowed actions cannot be edited, delete the trusted publisher and create it again with the same repository, workflow filename and environment, this time enabling **npm publish**.
