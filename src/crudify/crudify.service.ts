@@ -53,7 +53,10 @@ export class CrudifyService<T, C = Partial<T>, U = Partial<T>> {
   }
 
   async updateBulk(filter: any, updateDto: UpdateQuery<U>): Promise<any> {
-    return this.model.updateMany(filter, { $set: updateDto }).exec();
+    const update = Object.keys(updateDto).some((key) => key.startsWith("$"))
+      ? updateDto
+      : { $set: updateDto };
+    return this.model.updateMany(filter, update as UpdateQuery<T>).exec();
   }
 
   async delete(id: string): Promise<T | null> {

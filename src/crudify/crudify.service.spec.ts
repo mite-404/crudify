@@ -48,4 +48,28 @@ describe("CrudifyService", () => {
 
     expect(response.page).toBe(1);
   });
+
+  it("preserves atomic operators in updateBulk", async () => {
+    const exec = vi.fn().mockResolvedValue({ modifiedCount: 1 });
+    const updateMany = vi.fn().mockReturnValue({ exec });
+    const service = new CrudifyService<any>({ updateMany } as any);
+    const update = { $inc: { counter: 1 } };
+
+    await service.updateBulk({ active: true }, update);
+
+    expect(updateMany).toHaveBeenCalledWith({ active: true }, update);
+  });
+
+  it("wraps plain fields in $set in updateBulk", async () => {
+    const exec = vi.fn().mockResolvedValue({ modifiedCount: 1 });
+    const updateMany = vi.fn().mockReturnValue({ exec });
+    const service = new CrudifyService<any>({ updateMany } as any);
+
+    await service.updateBulk({ active: true }, { name: "updated" });
+
+    expect(updateMany).toHaveBeenCalledWith(
+      { active: true },
+      { $set: { name: "updated" } }
+    );
+  });
 });
